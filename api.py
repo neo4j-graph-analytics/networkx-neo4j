@@ -1,8 +1,7 @@
 import networkx as nx
 from neo4j.v1 import GraphDatabase, basic_auth
 
-from Graph import Graph
-import centrality
+import nxneo4j
 
 networkx_functions = {
     "betweenness_centrality": nx.centrality.betweenness_centrality,
@@ -10,8 +9,8 @@ networkx_functions = {
 }
 
 neo4j_functions = {
-    "betweenness_centrality": centrality.betweenness_centrality,
-    "closeness_centrality": centrality.closeness_centrality
+    "betweenness_centrality": nxneo4j.centrality.betweenness_centrality,
+    "closeness_centrality": nxneo4j.centrality.closeness_centrality
 }
 
 
@@ -34,8 +33,9 @@ def execute_graph(G, functions):
     print("Closeness (no WF): {0}".format(closeness(G, wf_improved=False)))
     print("Closeness (one node): {0}".format(closeness(G, 1, wf_improved=False)))
 
+
 print("Neo4j")
-execute_graph(Graph(GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "neo"))), neo4j_functions)
+execute_graph(nxneo4j.Graph(GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "neo"))), neo4j_functions)
 
 print()
 

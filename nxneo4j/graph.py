@@ -7,6 +7,7 @@ class Graph:
         self.direction = "BOTH"
         self.node_label = config.get("node_label", "Node")
         self.relationship_type = config.get("relationship_type", "CONNECTED")
+        self.graph = config.get("graph", "heavy")
 
     add_node_query = """\
     MERGE (:%s {value: {value} })
@@ -70,7 +71,8 @@ class Graph:
 
     betweenness_centrality_query = """\
     CALL algo.betweenness.stream({nodeLabel}, {relationshipType}, {
-        direction: {direction} 
+        direction: {direction},
+        graph: {graph}
     })
     YIELD nodeId, centrality
     MATCH (n:%s) WHERE id(n) = nodeId
@@ -84,6 +86,7 @@ class Graph:
                 "direction": self.direction,
                 "nodeLabel": self.node_label,
                 "relationshipType": self.relationship_type,
+                "graph": self.graph,
             }
 
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
@@ -92,20 +95,22 @@ class Graph:
     closeness_centrality_query = """\
     CALL algo.closeness.stream({nodeLabel}, {relationshipType}, {
       direction: {direction},
-      improved: {wassermanFaust}
+      improved: {wfImproved},
+      graph: {graph}
     })
     YIELD nodeId, centrality
     MATCH (n:%s) WHERE id(n) = nodeId
     RETURN n.value AS node, centrality
     """
 
-    def closeness_centrality(self, wasserman_faust=True):
+    def closeness_centrality(self, wf_improved=True):
         with self.driver.session() as session:
             params = {
                 "direction": self.direction,
                 "nodeLabel": self.node_label,
                 "relationshipType": self.relationship_type,
-                "wassermanFaust": wasserman_faust
+                "graph": self.graph,
+                "wfImproved": wf_improved
             }
             query = self.closeness_centrality_query % self.node_label
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
