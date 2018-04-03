@@ -1,0 +1,25 @@
+= networkx-neo4j
+
+NetworkX API for Neo4j Graph Algorithms.
+
+== Installation
+
+[source, bash]
+----
+pip install git+https://github.com/neo4j-graph-analytics/networkx-neo4j.git
+----
+
+== Usage
+
+[source, python]
+----
+import nxneo4j
+import os
+from neo4j.v1 import GraphDatabase, basic_auth
+
+user_name = os.environ.get("NEO4J_USER", "neo4j")
+password = os.environ.get("NEO4J_PASSWORD", "neo")
+
+driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth(user_name, password))
+g = nxneo4j.Graph(driver)
+----
