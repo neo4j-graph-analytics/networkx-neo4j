@@ -20,7 +20,7 @@ class Graph:
 
     add_nodes_query = """\
     UNWIND {values} AS value
-    MERGE (:%s {value: value })
+    MERGE (:`%s` {value: value })
     """
 
     def add_nodes_from(self, values):
@@ -29,9 +29,9 @@ class Graph:
             session.run(query, {"values": values})
 
     add_edge_query = """\
-    MERGE (node1:%s {value: {node1} })
-    MERGE (node2:%s {value: {node2} })
-    MERGE (node1)-[:%s]->(node2)
+    MERGE (node1:`%s` {value: {node1} })
+    MERGE (node2:`%s` {value: {node2} })
+    MERGE (node1)-[:`%s`]->(node2)
     """
 
     def add_edge(self, node1, node2):
@@ -45,9 +45,9 @@ class Graph:
 
     add_edges_query = """\
     UNWIND {edges} AS edge
-    MERGE (node1:%s {value: edge[0] })
-    MERGE (node2:%s {value: edge[1] })
-    MERGE (node1)-[:%s]->(node2)
+    MERGE (node1:`%s` {value: edge[0] })
+    MERGE (node2:`%s` {value: edge[1] })
+    MERGE (node1)-[:`%s`]->(node2)
     """
 
     def add_edges_from(self, edges):
@@ -60,7 +60,7 @@ class Graph:
             session.run(query, {"edges": [list(edge) for edge in edges]})
 
     number_of_nodes_query = """\
-    MATCH (:%s)
+    MATCH (:`%s`)
     RETURN count(*) AS numberOfNodes
     """
 
@@ -75,7 +75,7 @@ class Graph:
         graph: {graph}
     })
     YIELD nodeId, centrality
-    MATCH (n:%s) WHERE id(n) = nodeId
+    MATCH (n:`%s`) WHERE id(n) = nodeId
     RETURN n.value AS node, centrality
     """
 
@@ -99,7 +99,7 @@ class Graph:
       graph: {graph}
     })
     YIELD nodeId, centrality
-    MATCH (n:%s) WHERE id(n) = nodeId
+    MATCH (n:`%s`) WHERE id(n) = nodeId
     RETURN n.value AS node, centrality
     """
 
