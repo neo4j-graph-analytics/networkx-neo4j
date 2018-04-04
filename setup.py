@@ -38,6 +38,9 @@ if __name__ == "__main__":
         license="Apache 2",
         platforms="All",
         url="http://markhneedham.com",
+        install_requires=[
+            'neo4j-driver',
+        ],
         packages=packages,
         zip_safe=False
     )
