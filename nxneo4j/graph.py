@@ -185,3 +185,15 @@ class Graph:
             query = self.triangles_query % self.node_label
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
+
+    def clustering(self):
+        with self.driver.session() as session:
+            params = {
+                "direction": self.direction,
+                "nodeLabel": self.node_label,
+                "relationshipType": self.relationship_type,
+                "graph": self.graph
+            }
+            query = self.triangles_query % self.node_label
+            result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
+        return result

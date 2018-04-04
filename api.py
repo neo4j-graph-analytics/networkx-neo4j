@@ -8,7 +8,8 @@ networkx_functions = {
     "closeness_centrality": nx.closeness_centrality,
     "harmonic_centrality": nx.harmonic_centrality,
     "pagerank": nx.pagerank,
-    "triangles": nx.triangles
+    "triangles": nx.triangles,
+    "clustering": nx.clustering
 }
 
 neo4j_functions = {
@@ -16,7 +17,8 @@ neo4j_functions = {
     "closeness_centrality": nxneo4j.closeness_centrality,
     "harmonic_centrality": nxneo4j.harmonic_centrality,
     "pagerank": nxneo4j.pagerank,
-    "triangles": nxneo4j.triangles
+    "triangles": nxneo4j.triangles,
+    "clustering": nxneo4j.clustering
 }
 
 
@@ -48,6 +50,9 @@ def execute_graph(G, functions):
 
     triangles = functions["triangles"]
     print("Triangles: {0}".format(triangles(G)))
+
+    clustering = functions["triangles"]
+    print("Clustering Coefficient: {0}".format(clustering(G)))
 
 
 print("Neo4j")
