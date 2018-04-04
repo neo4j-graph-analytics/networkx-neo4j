@@ -239,5 +239,4 @@ class Graph:
             query = self.lpa_query % self.node_label
 
             for row in session.run(query, params):
-                print(row)
                 yield set(row["nodes"])
