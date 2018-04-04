@@ -4,17 +4,19 @@ from neo4j.v1 import GraphDatabase, basic_auth
 import nxneo4j
 
 networkx_functions = {
-    "betweenness_centrality": nx.centrality.betweenness_centrality,
-    "closeness_centrality": nx.centrality.closeness_centrality,
-    "harmonic_centrality": nx.centrality.harmonic_centrality,
-    "pagerank": nx.pagerank
+    "betweenness_centrality": nx.betweenness_centrality,
+    "closeness_centrality": nx.closeness_centrality,
+    "harmonic_centrality": nx.harmonic_centrality,
+    "pagerank": nx.pagerank,
+    "triangles": nx.triangles
 }
 
 neo4j_functions = {
-    "betweenness_centrality": nxneo4j.centrality.betweenness_centrality,
-    "closeness_centrality": nxneo4j.centrality.closeness_centrality,
-    "harmonic_centrality": nxneo4j.centrality.harmonic_centrality,
-    "pagerank": nxneo4j.pagerank
+    "betweenness_centrality": nxneo4j.betweenness_centrality,
+    "closeness_centrality": nxneo4j.closeness_centrality,
+    "harmonic_centrality": nxneo4j.harmonic_centrality,
+    "pagerank": nxneo4j.pagerank,
+    "triangles": nxneo4j.triangles
 }
 
 
@@ -24,7 +26,7 @@ def execute_graph(G, functions):
 
     G.add_edge(1, 2)
     G.add_edge(4, 5)
-    G.add_edges_from([(1, 2), (1, 3)])
+    G.add_edges_from([(1, 2), (1, 3), (2, 3)])
 
     print("Number of nodes: {0}".format(G.number_of_nodes()))
 
@@ -43,6 +45,9 @@ def execute_graph(G, functions):
 
     pagerank = functions["pagerank"]
     print("PageRank: {0}".format(pagerank(G)))
+
+    triangles = functions["triangles"]
+    print("Triangles: {0}".format(triangles(G)))
 
 
 print("Neo4j")

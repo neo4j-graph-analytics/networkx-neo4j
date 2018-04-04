@@ -163,3 +163,25 @@ class Graph:
             query = self.pagerank_query % self.node_label
             result = {row["node"]: row["score"] for row in session.run(query, params)}
         return result
+
+    triangles_query = """\
+    CALL algo.triangleCount.stream({nodeLabel}, {relationshipType}, {
+      direction: {direction},
+      graph: {graph}
+    })
+    YIELD nodeId, triangles
+    MATCH (n:`%s`) WHERE id(n) = nodeId
+    RETURN n.value AS node, triangles
+    """
+
+    def triangles(self):
+        with self.driver.session() as session:
+            params = {
+                "direction": self.direction,
+                "nodeLabel": self.node_label,
+                "relationshipType": self.relationship_type,
+                "graph": self.graph
+            }
+            query = self.triangles_query % self.node_label
+            result = {row["node"]: row["triangles"] for row in session.run(query, params)}
+        return result
