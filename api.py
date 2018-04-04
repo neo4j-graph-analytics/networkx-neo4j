@@ -22,7 +22,7 @@ neo4j_functions = {
     "triangles": nxneo4j.triangles,
     "clustering": nxneo4j.clustering,
     "average_clustering": nxneo4j.average_clustering,
-    "label_propagation_communities": nxneo4j.algorithms.community.label_propagation_communities
+    "label_propagation_communities": nxneo4j.community.label_propagation_communities
 }
 
 
