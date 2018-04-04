@@ -11,5 +11,14 @@ def closeness_centrality(G, u=None, distance=None,
 
 def betweenness_centrality(G, k=None, normalized=True, weight=None,
                            endpoints=False, seed=None):
-    # doesn't currently support `weight`
+    # doesn't currently support `weight`, `k`, `endpoints`, `seed`
     return G.betweenness_centrality()
+
+def harmonic_centrality(G, nbunch=None, distance=None):
+    # doesn't currently support `distance`
+    centralities = G.harmonic_centrality()
+
+    if nbunch:
+        return {k: v for k, v in centralities.items() if k in nbunch}
+
+    return centralities

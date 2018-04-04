@@ -115,3 +115,25 @@ class Graph:
             query = self.closeness_centrality_query % self.node_label
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
+
+    harmonic_centrality_query = """\
+    CALL algo.closeness.harmonic.stream({nodeLabel}, {relationshipType}, {
+      direction: {direction},
+      graph: {graph}
+    })
+    YIELD nodeId, centrality
+    MATCH (n:`%s`) WHERE id(n) = nodeId
+    RETURN n.value AS node, centrality
+    """
+
+    def harmonic_centrality(self):
+        with self.driver.session() as session:
+            params = {
+                "direction": self.direction,
+                "nodeLabel": self.node_label,
+                "relationshipType": self.relationship_type,
+                "graph": self.graph
+            }
+            query = self.harmonic_centrality_query % self.node_label
+            result = {row["node"]: row["centrality"] for row in session.run(query, params)}
+        return result

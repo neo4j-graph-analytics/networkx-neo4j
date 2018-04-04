@@ -5,12 +5,14 @@ import nxneo4j
 
 networkx_functions = {
     "betweenness_centrality": nx.centrality.betweenness_centrality,
-    "closeness_centrality": nx.centrality.closeness_centrality
+    "closeness_centrality": nx.centrality.closeness_centrality,
+    "harmonic_centrality": nx.centrality.harmonic_centrality
 }
 
 neo4j_functions = {
     "betweenness_centrality": nxneo4j.centrality.betweenness_centrality,
-    "closeness_centrality": nxneo4j.centrality.closeness_centrality
+    "closeness_centrality": nxneo4j.centrality.closeness_centrality,
+    "harmonic_centrality": nxneo4j.centrality.harmonic_centrality
 }
 
 
@@ -32,6 +34,10 @@ def execute_graph(G, functions):
     print("Closeness (WF): {0}".format(closeness(G, wf_improved=True)))
     print("Closeness (no WF): {0}".format(closeness(G, wf_improved=False)))
     print("Closeness (one node): {0}".format(closeness(G, 1, wf_improved=False)))
+
+    harmonic = functions["harmonic_centrality"]
+    print("Harmonic (default): {0}".format(harmonic(G)))
+    print("Harmonic (nbunch): {0}".format(harmonic(G, nbunch=[1,2,3])))
 
 
 print("Neo4j")
