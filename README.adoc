@@ -1,7 +1,7 @@
 = networkx-neo4j
 
 This library provides NetworkX API for https://github.com/neo4j-contrib/neo4j-graph-algorithms[Neo4j Graph Algorithms^].
-You should be able to use it as you would NetworkX but algorithms will run against Neo4j r
+You should be able to use it as you would NetworkX but algorithms will run against Neo4j.
 
 == Installation
 
