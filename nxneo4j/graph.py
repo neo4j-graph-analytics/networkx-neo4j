@@ -217,3 +217,27 @@ class Graph:
             query = self.triangle_query
             result = session.run(query, params)
             return result.peek()["averageClusteringCoefficient"]
+
+    lpa_query = """\
+    CALL algo.labelPropagation.stream({nodeLabel}, {relationshipType}, {
+      direction: {direction},
+      graph: {graph}
+    })
+    YIELD nodeId, label
+    MATCH (n:`%s`) WHERE id(n) = nodeId
+    RETURN label, collect(n.value) AS nodes
+    """
+
+    def label_propagation(self):
+        with self.driver.session() as session:
+            params = {
+                "direction": self.direction,
+                "nodeLabel": self.node_label,
+                "relationshipType": self.relationship_type,
+                "graph": self.graph
+            }
+            query = self.lpa_query % self.node_label
+
+            for row in session.run(query, params):
+                print(row)
+                yield set(row["nodes"])

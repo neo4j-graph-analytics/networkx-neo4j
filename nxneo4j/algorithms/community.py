@@ -18,4 +18,9 @@ def clustering(G, nodes=None, weight=None):
 
 
 def average_clustering(G, nodes=None, weight=None, count_zeros=True):
+    # doesn't currently support `nodes`, `weight`, `count_zeros`
     return G.average_clustering()
+
+
+def label_propagation_communities(G):
+    return G.label_propagation()

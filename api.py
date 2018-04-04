@@ -10,7 +10,8 @@ networkx_functions = {
     "pagerank": nx.pagerank,
     "triangles": nx.triangles,
     "clustering": nx.clustering,
-    "average_clustering": nx.average_clustering
+    "average_clustering": nx.average_clustering,
+    "label_propagation_communities": nx.algorithms.community.label_propagation_communities
 }
 
 neo4j_functions = {
@@ -20,7 +21,8 @@ neo4j_functions = {
     "pagerank": nxneo4j.pagerank,
     "triangles": nxneo4j.triangles,
     "clustering": nxneo4j.clustering,
-    "average_clustering": nxneo4j.average_clustering
+    "average_clustering": nxneo4j.average_clustering,
+    "label_propagation_communities": nxneo4j.algorithms.community.label_propagation_communities
 }
 
 
@@ -58,6 +60,9 @@ def execute_graph(G, functions):
 
     average_clustering = functions["average_clustering"]
     print("Average Clustering Coefficient: {0}".format(average_clustering(G)))
+
+    lpa = functions["label_propagation_communities"]
+    print("Label Propagation: {0}".format(list(lpa(G))))
 
 
 print("Neo4j")
