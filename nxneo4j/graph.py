@@ -164,14 +164,14 @@ class Graph:
             result = {row["node"]: row["score"] for row in session.run(query, params)}
         return result
 
-    triangles_query = """\
+    triangle_count_query = """\
     CALL algo.triangleCount.stream({nodeLabel}, {relationshipType}, {
       direction: {direction},
       graph: {graph}
     })
-    YIELD nodeId, triangles
+    YIELD nodeId, triangles, coefficient
     MATCH (n:`%s`) WHERE id(n) = nodeId
-    RETURN n.value AS node, triangles
+    RETURN n.value AS node, triangles, coefficient
     """
 
     def triangles(self):
@@ -182,7 +182,7 @@ class Graph:
                 "relationshipType": self.relationship_type,
                 "graph": self.graph
             }
-            query = self.triangles_query % self.node_label
+            query = self.triangle_count_query % self.node_label
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
 
@@ -194,6 +194,26 @@ class Graph:
                 "relationshipType": self.relationship_type,
                 "graph": self.graph
             }
-            query = self.triangles_query % self.node_label
+            query = self.triangle_count_query % self.node_label
             result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
         return result
+
+    triangle_query = """\
+    CALL algo.triangleCount({nodeLabel}, {relationshipType}, {
+      direction: {direction},
+      graph: {graph},
+      write: false
+    })
+    """
+
+    def average_clustering(self):
+        with self.driver.session() as session:
+            params = {
+                "direction": self.direction,
+                "nodeLabel": self.node_label,
+                "relationshipType": self.relationship_type,
+                "graph": self.graph
+            }
+            query = self.triangle_query
+            result = session.run(query, params)
+            return result.peek()["averageClusteringCoefficient"]
