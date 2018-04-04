@@ -6,13 +6,15 @@ import nxneo4j
 networkx_functions = {
     "betweenness_centrality": nx.centrality.betweenness_centrality,
     "closeness_centrality": nx.centrality.closeness_centrality,
-    "harmonic_centrality": nx.centrality.harmonic_centrality
+    "harmonic_centrality": nx.centrality.harmonic_centrality,
+    "pagerank": nx.pagerank
 }
 
 neo4j_functions = {
     "betweenness_centrality": nxneo4j.centrality.betweenness_centrality,
     "closeness_centrality": nxneo4j.centrality.closeness_centrality,
-    "harmonic_centrality": nxneo4j.centrality.harmonic_centrality
+    "harmonic_centrality": nxneo4j.centrality.harmonic_centrality,
+    "pagerank": nxneo4j.pagerank
 }
 
 
@@ -37,7 +39,10 @@ def execute_graph(G, functions):
 
     harmonic = functions["harmonic_centrality"]
     print("Harmonic (default): {0}".format(harmonic(G)))
-    print("Harmonic (nbunch): {0}".format(harmonic(G, nbunch=[1,2,3])))
+    print("Harmonic (nbunch): {0}".format(harmonic(G, nbunch=[1, 2, 3])))
+
+    pagerank = functions["pagerank"]
+    print("PageRank: {0}".format(pagerank(G)))
 
 
 print("Neo4j")

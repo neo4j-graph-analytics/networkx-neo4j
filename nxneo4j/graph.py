@@ -137,3 +137,29 @@ class Graph:
             query = self.harmonic_centrality_query % self.node_label
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
+
+    pagerank_query = """\
+    CALL algo.pageRank.stream({nodeLabel}, {relationshipType}, {
+      direction: {direction},
+      graph: {graph},
+      iterations: {iterations},
+      dampingFactor: {dampingFactor}
+    })
+    YIELD nodeId, score
+    MATCH (n:`%s`) WHERE id(n) = nodeId
+    RETURN n.value AS node, score
+    """
+
+    def pagerank(self, alpha, max_iter):
+        with self.driver.session() as session:
+            params = {
+                "direction": self.direction,
+                "nodeLabel": self.node_label,
+                "relationshipType": self.relationship_type,
+                "graph": self.graph,
+                "iterations": max_iter,
+                "dampingFactor": alpha
+            }
+            query = self.pagerank_query % self.node_label
+            result = {row["node"]: row["score"] for row in session.run(query, params)}
+        return result
