@@ -54,6 +54,8 @@ if __name__ == '__main__':
         "label_propagation_communities": nx.algorithms.community.label_propagation_communities
     }
 
+    print(dir(nxneo4j))
+
     neo4j_functions = {
         "betweenness_centrality": nxneo4j.betweenness_centrality,
         "closeness_centrality": nxneo4j.closeness_centrality,
