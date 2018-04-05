@@ -3,28 +3,6 @@ from neo4j.v1 import GraphDatabase, basic_auth
 
 import nxneo4j
 
-networkx_functions = {
-    "betweenness_centrality": nx.betweenness_centrality,
-    "closeness_centrality": nx.closeness_centrality,
-    "harmonic_centrality": nx.harmonic_centrality,
-    "pagerank": nx.pagerank,
-    "triangles": nx.triangles,
-    "clustering": nx.clustering,
-    "average_clustering": nx.average_clustering,
-    "label_propagation_communities": nx.algorithms.community.label_propagation_communities
-}
-
-neo4j_functions = {
-    "betweenness_centrality": nxneo4j.betweenness_centrality,
-    "closeness_centrality": nxneo4j.closeness_centrality,
-    "harmonic_centrality": nxneo4j.harmonic_centrality,
-    "pagerank": nxneo4j.pagerank,
-    "triangles": nxneo4j.triangles,
-    "clustering": nxneo4j.clustering,
-    "average_clustering": nxneo4j.average_clustering,
-    "label_propagation_communities": nxneo4j.community.label_propagation_communities
-}
-
 
 def execute_graph(G, functions):
     G.add_node(1)
@@ -64,11 +42,34 @@ def execute_graph(G, functions):
     lpa = functions["label_propagation_communities"]
     print("Label Propagation: {0}".format(list(lpa(G))))
 
+if __name__ == '__main__':
+    networkx_functions = {
+        "betweenness_centrality": nx.betweenness_centrality,
+        "closeness_centrality": nx.closeness_centrality,
+        "harmonic_centrality": nx.harmonic_centrality,
+        "pagerank": nx.pagerank,
+        "triangles": nx.triangles,
+        "clustering": nx.clustering,
+        "average_clustering": nx.average_clustering,
+        "label_propagation_communities": nx.algorithms.community.label_propagation_communities
+    }
 
-print("Neo4j")
-execute_graph(nxneo4j.Graph(GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "neo"))), neo4j_functions)
+    neo4j_functions = {
+        "betweenness_centrality": nxneo4j.betweenness_centrality,
+        "closeness_centrality": nxneo4j.closeness_centrality,
+        "harmonic_centrality": nxneo4j.harmonic_centrality,
+        "pagerank": nxneo4j.pagerank,
+        "triangles": nxneo4j.triangles,
+        "clustering": nxneo4j.clustering,
+        "average_clustering": nxneo4j.average_clustering,
+        "label_propagation_communities": nxneo4j.community.label_propagation_communities
+    }
 
-print()
+    print("Neo4j")
+    execute_graph(nxneo4j.Graph(GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "neo"))),
+                  neo4j_functions)
 
-print("networkx")
-execute_graph(nx.Graph(), networkx_functions)
+    print()
+
+    print("networkx")
+    execute_graph(nx.Graph(), networkx_functions)

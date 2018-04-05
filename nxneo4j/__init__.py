@@ -1,3 +1,5 @@
-from nxneo4j.centrality import *
-from nxneo4j.community import *
-from nxneo4j.graph import Graph
+
+import nxneo4j.algorithms
+from nxneo4j.algorithms import *
+
+

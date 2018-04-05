@@ -22,7 +22,9 @@ if sys.version_info[:2] < (3, 6):
           sys.version_info[:2])
     sys.exit(-1)
 
-packages = ["nxneo4j"]
+packages = [
+    "nxneo4j",
+]
 
 if __name__ == "__main__":
     setup(
