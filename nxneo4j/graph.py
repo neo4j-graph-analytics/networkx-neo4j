@@ -82,13 +82,7 @@ class Graph:
     def betweenness_centrality(self):
         with self.driver.session() as session:
             query = self.betweenness_centrality_query
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph,
-            }
-
+            params = self.base_params()
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
 
@@ -105,13 +99,8 @@ class Graph:
 
     def closeness_centrality(self, wf_improved=True):
         with self.driver.session() as session:
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph,
-                "wfImproved": wf_improved
-            }
+            params = self.base_params()
+            params["wfImproved"] = wf_improved
             query = self.closeness_centrality_query
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
@@ -128,12 +117,7 @@ class Graph:
 
     def harmonic_centrality(self):
         with self.driver.session() as session:
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph
-            }
+            params = self.base_params()
             query = self.harmonic_centrality_query
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
@@ -152,14 +136,10 @@ class Graph:
 
     def pagerank(self, alpha, max_iter):
         with self.driver.session() as session:
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph,
-                "iterations": max_iter,
-                "dampingFactor": alpha
-            }
+            params = self.base_params()
+            params["iterations"] = max_iter
+            params["dampingFactor"] = alpha
+
             query = self.pagerank_query % self.node_label
             result = {row["node"]: row["score"] for row in session.run(query, params)}
         return result
@@ -176,24 +156,14 @@ class Graph:
 
     def triangles(self):
         with self.driver.session() as session:
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph
-            }
+            params = self.base_params()
             query = self.triangle_count_query
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
 
     def clustering(self):
         with self.driver.session() as session:
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph
-            }
+            params = self.base_params()
             query = self.triangle_count_query
             result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
         return result
@@ -208,12 +178,7 @@ class Graph:
 
     def average_clustering(self):
         with self.driver.session() as session:
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph
-            }
+            params = self.base_params()
             query = self.triangle_query
             result = session.run(query, params)
             return result.peek()["averageClusteringCoefficient"]
@@ -230,13 +195,16 @@ class Graph:
 
     def label_propagation(self):
         with self.driver.session() as session:
-            params = {
-                "direction": self.direction,
-                "nodeLabel": self.node_label,
-                "relationshipType": self.relationship_type,
-                "graph": self.graph
-            }
+            params = self.base_params()
             query = self.lpa_query
 
             for row in session.run(query, params):
                 yield set(row["nodes"])
+
+    def base_params(self):
+        return {
+            "direction": self.direction,
+            "nodeLabel": self.node_label,
+            "relationshipType": self.relationship_type,
+            "graph": self.graph
+        }
