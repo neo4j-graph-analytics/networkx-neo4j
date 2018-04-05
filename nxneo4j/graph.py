@@ -8,29 +8,30 @@ class Graph:
         self.node_label = config.get("node_label", "Node")
         self.relationship_type = config.get("relationship_type", "CONNECTED")
         self.graph = config.get("graph", "heavy")
+        self.identifier_property = config.get("identifier_property", "value")
 
     add_node_query = """\
-    MERGE (:%s {value: {value} })
+    MERGE (:`%s` {`%s`: {value} })
     """
 
     def add_node(self, value):
         with self.driver.session() as session:
-            query = self.add_node_query % self.node_label
+            query = self.add_node_query % (self.node_label, self.identifier_property)
             session.run(query, {"value": value})
 
     add_nodes_query = """\
     UNWIND {values} AS value
-    MERGE (:`%s` {value: value })
+    MERGE (:`%s` {`%s`: value })
     """
 
     def add_nodes_from(self, values):
         with self.driver.session() as session:
-            query = self.add_nodes_query % self.node_label
+            query = self.add_nodes_query % (self.node_label, self.identifier_property)
             session.run(query, {"values": values})
 
     add_edge_query = """\
-    MERGE (node1:`%s` {value: {node1} })
-    MERGE (node2:`%s` {value: {node2} })
+    MERGE (node1:`%s` {`%s`: {node1} })
+    MERGE (node2:`%s` {`%s`: {node2} })
     MERGE (node1)-[:`%s`]->(node2)
     """
 
@@ -38,15 +39,17 @@ class Graph:
         with self.driver.session() as session:
             query = self.add_edge_query % (
                 self.node_label,
+                self.identifier_property,
                 self.node_label,
+                self.identifier_property,
                 self.relationship_type
             )
             session.run(query, {"node1": node1, "node2": node2})
 
     add_edges_query = """\
     UNWIND {edges} AS edge
-    MERGE (node1:`%s` {value: edge[0] })
-    MERGE (node2:`%s` {value: edge[1] })
+    MERGE (node1:`%s` {`%s`: edge[0] })
+    MERGE (node2:`%s` {`%s`: edge[1] })
     MERGE (node1)-[:`%s`]->(node2)
     """
 
@@ -54,7 +57,9 @@ class Graph:
         with self.driver.session() as session:
             query = self.add_edges_query % (
                 self.node_label,
+                self.identifier_property,
                 self.node_label,
+                self.identifier_property,
                 self.relationship_type
             )
             session.run(query, {"edges": [list(edge) for edge in edges]})
