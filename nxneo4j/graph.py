@@ -75,13 +75,13 @@ class Graph:
         graph: {graph}
     })
     YIELD nodeId, centrality
-    MATCH (n:`%s`) WHERE id(n) = nodeId
+    MATCH (n) WHERE id(n) = nodeId
     RETURN n.value AS node, centrality
     """
 
     def betweenness_centrality(self):
         with self.driver.session() as session:
-            query = self.betweenness_centrality_query % self.node_label
+            query = self.betweenness_centrality_query
             params = {
                 "direction": self.direction,
                 "nodeLabel": self.node_label,
@@ -99,7 +99,7 @@ class Graph:
       graph: {graph}
     })
     YIELD nodeId, centrality
-    MATCH (n:`%s`) WHERE id(n) = nodeId
+    MATCH (n) WHERE id(n) = nodeId
     RETURN n.value AS node, centrality
     """
 
@@ -112,7 +112,7 @@ class Graph:
                 "graph": self.graph,
                 "wfImproved": wf_improved
             }
-            query = self.closeness_centrality_query % self.node_label
+            query = self.closeness_centrality_query
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
 
@@ -122,7 +122,7 @@ class Graph:
       graph: {graph}
     })
     YIELD nodeId, centrality
-    MATCH (n:`%s`) WHERE id(n) = nodeId
+    MATCH (n) WHERE id(n) = nodeId
     RETURN n.value AS node, centrality
     """
 
@@ -134,7 +134,7 @@ class Graph:
                 "relationshipType": self.relationship_type,
                 "graph": self.graph
             }
-            query = self.harmonic_centrality_query % self.node_label
+            query = self.harmonic_centrality_query
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
 
@@ -170,7 +170,7 @@ class Graph:
       graph: {graph}
     })
     YIELD nodeId, triangles, coefficient
-    MATCH (n:`%s`) WHERE id(n) = nodeId
+    MATCH (n) WHERE id(n) = nodeId
     RETURN n.value AS node, triangles, coefficient
     """
 
@@ -182,7 +182,7 @@ class Graph:
                 "relationshipType": self.relationship_type,
                 "graph": self.graph
             }
-            query = self.triangle_count_query % self.node_label
+            query = self.triangle_count_query
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
 
@@ -194,7 +194,7 @@ class Graph:
                 "relationshipType": self.relationship_type,
                 "graph": self.graph
             }
-            query = self.triangle_count_query % self.node_label
+            query = self.triangle_count_query
             result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
         return result
 
@@ -224,7 +224,7 @@ class Graph:
       graph: {graph}
     })
     YIELD nodeId, label
-    MATCH (n:`%s`) WHERE id(n) = nodeId
+    MATCH (n) WHERE id(n) = nodeId
     RETURN label, collect(n.value) AS nodes
     """
 
@@ -236,7 +236,7 @@ class Graph:
                 "relationshipType": self.relationship_type,
                 "graph": self.graph
             }
-            query = self.lpa_query % self.node_label
+            query = self.lpa_query
 
             for row in session.run(query, params):
                 yield set(row["nodes"])
