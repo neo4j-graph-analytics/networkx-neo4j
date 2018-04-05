@@ -123,7 +123,7 @@ class Graph:
     def harmonic_centrality(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.harmonic_centrality_query
+            query = self.harmonic_centrality_query % self.identifier_property
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
 
@@ -145,7 +145,7 @@ class Graph:
             params["iterations"] = max_iter
             params["dampingFactor"] = alpha
 
-            query = self.pagerank_query % self.node_label
+            query = self.pagerank_query % self.identifier_property
             result = {row["node"]: row["score"] for row in session.run(query, params)}
         return result
 

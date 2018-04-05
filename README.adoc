@@ -49,6 +49,10 @@ And run algorithms against it:
 [{1, 2, 3}, {4, 5}]
 ----
 
+== NetworkX vs Neo4j
+
+You can also run an example showing NetworkX and Neo4j side by side:
+
 [source,bash]
 ----
 python -m examples.networkx_vs_neo4j
