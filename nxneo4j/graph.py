@@ -107,6 +107,7 @@ class Graph:
             params = self.base_params()
             params["wfImproved"] = wf_improved
             query = self.closeness_centrality_query % self.identifier_property
+
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
 
