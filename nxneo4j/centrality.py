@@ -1,3 +1,9 @@
+def betweenness_centrality(G, k=None, normalized=True, weight=None,
+                           endpoints=False, seed=None):
+    # doesn't currently support `weight`, `k`, `endpoints`, `seed`
+    return G.betweenness_centrality()
+
+
 def closeness_centrality(G, u=None, distance=None,
                          wf_improved=True, reverse=False):
     # doesn't currently supported `distance`, `reverse`
