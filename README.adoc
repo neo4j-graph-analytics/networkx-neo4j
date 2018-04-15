@@ -5,7 +5,7 @@ You should be able to use it as you would NetworkX but algorithms will run again
 
 == Installation
 
-I haven't deployed this yet but you can still install using pip directly from the repo.
+I haven't deployed this to the pip repository yet but you can still install it directly GitHub:
 
 [source, bash]
 ----
@@ -57,3 +57,17 @@ You can also run an example showing NetworkX and Neo4j side by side:
 ----
 python -m examples.networkx_vs_neo4j
 ----
+
+== What's still missing?
+
+Not all the algorithms are translated yet.
+These ones are next on the list:
+
+* Shortest path
+* A-star
+* Strongly connected components
+* Connected components
+
+Also:
+
+* Support directed graphs
