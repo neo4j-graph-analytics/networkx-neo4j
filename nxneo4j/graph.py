@@ -207,6 +207,36 @@ class Graph:
             for row in session.run(query, params):
                 yield set(row["nodes"])
 
+    shortest_path_query = """\
+    MATCH (source:`%s` {`%s`: {source} })
+    MATCH (target:`%s` {`%s`: {target} })
+    CALL algo.shortestPath.stream(source, target, {propertyName}, {
+      direction: {direction},
+      graph: {graph}
+    }) 
+    YIELD nodeId, cost
+    MATCH (n) WHERE id(n) = nodeId
+    RETURN n.`%s` AS node, cost
+    """
+
+    def shortest_path(self, source, target, weight):
+        with self.driver.session() as session:
+            params = self.base_params()
+            params["source"] = source
+            params["target"] = target
+            params["propertyName"] = weight
+
+            query = self.shortest_path_query % (
+                self.node_label,
+                self.identifier_property,
+                self.node_label,
+                self.identifier_property,
+                self.identifier_property
+            )
+
+            result = [row["node"] for row in session.run(query, params)]
+        return result
+
     def base_params(self):
         return {
             "direction": self.direction,

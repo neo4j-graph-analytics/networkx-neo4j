@@ -11,7 +11,8 @@ networkx_functions = {
     "triangles": nx.triangles,
     "clustering": nx.clustering,
     "average_clustering": nx.average_clustering,
-    "label_propagation_communities": nx.algorithms.community.label_propagation_communities
+    "label_propagation_communities": nx.algorithms.community.label_propagation_communities,
+    "shortest_path": nx.shortest_path
 }
 
 neo4j_functions = {
@@ -22,7 +23,8 @@ neo4j_functions = {
     "triangles": nxneo4j.triangles,
     "clustering": nxneo4j.clustering,
     "average_clustering": nxneo4j.average_clustering,
-    "label_propagation_communities": nxneo4j.community.label_propagation_communities
+    "label_propagation_communities": nxneo4j.community.label_propagation_communities,
+    "shortest_path": nxneo4j.shortest_path
 }
 
 
@@ -32,7 +34,7 @@ def execute_graph(G, functions):
 
     G.add_edge(1, 2)
     G.add_edge(4, 5)
-    G.add_edges_from([(1, 2), (1, 3), (2, 3)])
+    G.add_edges_from([(1, 2), (1, 3), (2, 3), (3, 4), (4, 5)])
 
     print("Number of nodes: {0}".format(G.number_of_nodes()))
 
@@ -63,6 +65,9 @@ def execute_graph(G, functions):
 
     lpa = functions["label_propagation_communities"]
     print("Label Propagation: {0}".format(list(lpa(G))))
+
+    shortest_path = functions["shortest_path"]
+    print("Shortest Path: {0}".format(shortest_path(G, 1, 5, 'weight')))
 
 
 if __name__ == '__main__':
