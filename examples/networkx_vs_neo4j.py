@@ -12,7 +12,7 @@ networkx_functions = {
     "clustering": nx.clustering,
     "average_clustering": nx.average_clustering,
     "label_propagation_communities": nx.algorithms.community.label_propagation_communities,
-    "shortest_path": nx.shortest_path
+    "shortest_path": nx.shortest_path,
 }
 
 neo4j_functions = {
@@ -24,7 +24,7 @@ neo4j_functions = {
     "clustering": nxneo4j.clustering,
     "average_clustering": nxneo4j.average_clustering,
     "label_propagation_communities": nxneo4j.community.label_propagation_communities,
-    "shortest_path": nxneo4j.shortest_path
+    "shortest_path": nxneo4j.shortest_path,
 }
 
 
@@ -68,6 +68,9 @@ def execute_graph(G, functions):
 
     shortest_path = functions["shortest_path"]
     print("Shortest Path: {0}".format(shortest_path(G, 1, 5, 'weight')))
+    print("Shortest Path: {0}".format(shortest_path(G, 1, 5)))
+
+    print("Single Source Shortest Path: {0}".format(shortest_path(G, 1)))
 
 
 if __name__ == '__main__':
