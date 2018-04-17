@@ -24,3 +24,11 @@ def average_clustering(G, nodes=None, weight=None, count_zeros=True):
 
 def label_propagation_communities(G):
     return G.label_propagation()
+
+
+def connected_components(G):
+    return G.connected_components()
+
+
+def number_connected_components(G):
+    return sum(1 for cc in connected_components(G))

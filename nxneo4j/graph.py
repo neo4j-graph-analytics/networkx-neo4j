@@ -255,33 +255,23 @@ class Graph:
             result = [row["node"] for row in session.run(query, params)]
         return result
 
-    single_source_shortest_path_query = """\
-    MATCH (source:`%s` {`%s`: {source} })
-    CALL algo.shortestPaths.stream(source, {propertyName}, {
+    connected_components_query = """\
+    CALL algo.unionFind.stream({nodeLabel}, {relationshipType}, {
       direction: {direction},
       graph: {graph}
-    }) 
-    YIELD nodeId, distance
+    })
+    YIELD nodeId, setId
     MATCH (n) WHERE id(n) = nodeId
-    RETURN n.`%s` AS node, distance
+    RETURN setId, collect(n.`%s`) AS nodes
     """
 
-    def single_source_shortest_path(self, source):
+    def connected_components(self):
         with self.driver.session() as session:
             params = self.base_params()
-            params["source"] = source
-            params["propertyName"] = None
+            query = self.lpa_query % self.identifier_property
 
-            query = self.single_source_shortest_path_query % (
-                self.node_label,
-                self.identifier_property,
-                self.identifier_property
-            )
-            result = session.run(query, params)
-            for row in result:
-                print(row)
-
-        return result
+            for row in session.run(query, params):
+                yield set(row["nodes"])
 
     def base_params(self):
         return {

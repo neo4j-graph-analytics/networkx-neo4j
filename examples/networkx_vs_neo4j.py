@@ -13,6 +13,8 @@ networkx_functions = {
     "average_clustering": nx.average_clustering,
     "label_propagation_communities": nx.algorithms.community.label_propagation_communities,
     "shortest_path": nx.shortest_path,
+    "connected_components": nx.connected_components,
+    "number_connected_components": nx.number_connected_components
 }
 
 neo4j_functions = {
@@ -25,6 +27,8 @@ neo4j_functions = {
     "average_clustering": nxneo4j.average_clustering,
     "label_propagation_communities": nxneo4j.community.label_propagation_communities,
     "shortest_path": nxneo4j.shortest_path,
+    "connected_components": nxneo4j.connected_components,
+    "number_connected_components": nxneo4j.number_connected_components
 }
 
 
@@ -68,9 +72,14 @@ def execute_graph(G, functions):
 
     shortest_path = functions["shortest_path"]
     print("Shortest Path: {0}".format(shortest_path(G, 1, 5, 'weight')))
-    print("Shortest Path: {0}".format(shortest_path(G, 1, 5)))
+    print("Single Shortest Path: {0}".format(shortest_path(G, 1)))
 
-    print("Single Source Shortest Path: {0}".format(shortest_path(G, 1)))
+    connected_components = functions["connected_components"]
+    print("Connected Components: {0}".format(list(connected_components(G))))
+
+    number_connected_components = functions["number_connected_components"]
+    print("# Connected Components: {0}".format(number_connected_components(G)))
+
 
 
 if __name__ == '__main__':
