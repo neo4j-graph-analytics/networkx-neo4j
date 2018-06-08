@@ -149,7 +149,48 @@ for community in sorted_communities[:10]:
 
 == What algorithms are supported?
 
+Centrality:
 
+[source, python]
+----
+for module in dir(nxneo4j.centrality):
+    if not module.startswith("__"):
+        print(module)
+
+betweenness_centrality
+closeness_centrality
+harmonic_centrality
+pagerank
+----
+
+Community Detection:
+
+[source, python]
+----
+for module in dir(nxneo4j.community):
+    if not module.startswith("__"):
+        print(module)
+
+average_clustering
+clustering
+connected_components
+label_propagation_communities
+number_connected_components
+triangles
+----
+
+Path Finding:
+
+[source, python]
+----
+for module in dir(nxneo4j.path_finding):
+    if not module.startswith("__"):
+        print(module)
+
+shortest_path
+----
+
+Shortest Path currently only works if you provide both `Target` and `Source` nodes.
 
 == What's still missing?
 
@@ -158,12 +199,6 @@ These ones are next on the list:
 
 * Shortest path
 * A-star
-* Strongly connected components
-* Connected components
-
-Also:
-
-* Support directed graphs
 
 == NetworkX vs Neo4j
 
