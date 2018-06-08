@@ -12,6 +12,9 @@ I haven't deployed this to the PyPi yet but you can still install it directly Gi
 pip install git+https://github.com/neo4j-graph-analytics/networkx-neo4j.git#egg=networkx-neo4j
 ----
 
+You'll also need to install Neo4j and the Graph Algorithms library.
+My colleague Jennifer Reif has https://medium.com/neo4j/explore-new-worlds-adding-plugins-to-neo4j-26e6a8e5d37e[a detailed post explaining how to do this^].
+
 == Usage
 
 Here's how you use it.
