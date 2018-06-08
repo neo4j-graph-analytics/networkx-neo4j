@@ -144,8 +144,6 @@ for community in sorted_communities[:10]:
 ['Koss', 'Woth', 'Meralyn', 'Mad-Huntsman', 'Dobber', 'Ravella-Swann', 'Ternesio-Terys', 'Yoren', 'Amabel', 'Waif']
 ----
 
-
-
 == What algorithms are supported?
 
 
