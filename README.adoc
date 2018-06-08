@@ -5,16 +5,18 @@ You should be able to use it as you would NetworkX but algorithms will run again
 
 == Installation
 
-I haven't deployed this to the pip repository yet but you can still install it directly GitHub:
+I haven't deployed this to the PyPi yet but you can still install it directly GitHub:
 
 [source, bash]
 ----
-pip install git+https://github.com/neo4j-graph-analytics/networkx-neo4j.git
+pip install git+https://github.com/neo4j-graph-analytics/networkx-neo4j.git#egg=networkx-neo4j
 ----
 
 == Usage
 
-And here's how you use it:
+Here's how you use it.
+
+First let's import our libraries and create an instance of the Neo4j driver:
 
 [source, python]
 ----
@@ -26,6 +28,12 @@ user_name = os.environ.get("NEO4J_USER", "neo4j")
 password = os.environ.get("NEO4J_PASSWORD", "neo")
 
 driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth(user_name, password))
+----
+
+And now let's create a `Graph` object around the driver:
+
+[source, python]
+----
 G = nxneo4j.Graph(driver)
 ----
 
@@ -49,14 +57,98 @@ And run algorithms against it:
 [{1, 2, 3}, {4, 5}]
 ----
 
-== NetworkX vs Neo4j
+== Graph of Thrones
 
-You can also run an example showing NetworkX and Neo4j side by side:
+We can also work with an existing graph.
+You can import this dataset by playing the following guide from the Neo4j browser:
 
-[source,bash]
+```
+:play http://guides.neo4j.com/data_science/01_eda.html
+```
+
+And then click through the sections that import the data.
+This graph contains nodes with a `Character` label that have `INTERACTS1`, `INTERACTS2`, `INTERACTS3`, and `INTERACTS45` relationships between them.
+
+Now let's create a `Graph` object that knows about this graph.
+First we'll create a config map that we'll pass in to the `Graph()` constructor.
+
+[source, python]
 ----
-python -m examples.networkx_vs_neo4j
+config = {
+    "node_label": "Character",
+    "relationship_type": None,
+    "identifier_property": "name"
+}
 ----
+
+We set:
+
+* `node_label` is `Character` so that we'll only consider nodes with that label
+* `relationship_type` is `None` so that we'll consider all relationship types in the graph
+* `identifier_property` is the node property that we'll use to identify each node from the networkx-neo4j API
+
+[source, python]
+----
+G = nxneo4j.Graph(driver, config)
+----
+
+We can find the most influential characters by executing the PageRank algorithm against this graph like this:
+
+[source, python]
+----
+sorted_pagerank = sorted(nxneo4j.centrality.pagerank(G).items(), key=lambda x: x[1], reverse=True)
+for character, score in sorted_pagerank[:10]:
+    print(character, score)
+
+Tyrion-Lannister 11.312183000000001
+Stannis-Baratheon 7.211595999999998
+Tywin-Lannister 6.997056000000001
+Varys 6.228078
+Theon-Greyjoy 4.6472225
+Sansa-Stark 4.234794
+Walder-Frey 3.2763000000000004
+Robb-Stark 3.0024044999999995
+Samwell-Tarly 2.9787575000000004
+Jon-Snow 2.9183989999999995
+----
+
+Hopefully there are some familiar names there!
+
+What about if we want to find the shortest path between characters?
+
+[source, python]
+----
+nxneo4j.path_finding.shortest_path(G, "Tyrion-Lannister", "Hodor")
+
+['Tyrion-Lannister', 'Robb-Stark', 'Hodor']
+----
+
+We can also partition the characters into communities:
+
+[source, python]
+----
+communities = nxneo4j.community.label_propagation_communities(G)
+sorted_communities = sorted(communities, key=lambda x: len(x), reverse=True)
+for community in sorted_communities[:10]:
+    print(list(community)[:10])
+
+['Josmyn-Peckledon', 'Belwas', 'Rafford', 'Polliver', 'Petyr-Frey', 'Tristifer-IV-Mudd', 'Jeyne-Heddle', 'Urswyck', 'Falyse-Stokeworth', 'Hoster-Blackwood']
+['Trystane-Martell', 'Blue-Bard', 'Matthos-Seaworth', 'Marya-Seaworth', 'Mors-Umber', 'Jaehaerys-I-Targaryen', 'Myrcella-Baratheon', 'Justin-Massey', 'Denys-Mallister', 'Clayton-Suggs']
+['Oberyn-Martell', 'Nurse', 'Tommen-Baratheon', 'Tanda-Stokeworth', 'Garlan-Tyrell', 'Morgo', 'Qavo-Nogarys', 'Moon-Boy', 'Leonette-Fossoway', 'Allar-Deem']
+['Owen', 'Jon-Snow', 'Gerrick-Kingsblood', 'Lanna-(Happy-Port)', 'Maekar-I-Targaryen', 'Gorne', 'Arron', 'Arson', 'Satin', 'Rast']
+['Asha-Greyjoy', 'Palla', 'Squirrel', 'Tristifer-Botley', 'Yellow-Dick', 'Lorren', 'Jason-Mallister', 'Benfred-Tallhart', 'Kyra', 'Gynir']
+['Harras-Harlaw', 'Baelor-Blacktyde', 'Dunstan-Drumm', 'Ralf-Stonehouse', 'Gorold-Goodbrother', 'Rodrik-Harlaw', 'Talbert-Serry', 'Sigfryd-Harlaw', 'Rodrik-Sparr', 'Wulfe']
+['Alliser-Thorne', 'Othell-Yarwyck', 'Jaremy-Rykker', 'Ragwyle', 'Craster', 'Clubfoot-Karl', 'Blane', 'Donal-Noye', 'Halder', 'Mag-Mar-Tun-Doh-Weg']
+['Tomard', 'Horton-Redfort', 'Lothor-Brune', 'Myranda-Royce', 'Grisel', 'Merrett-Frey', 'Loras-Tyrell', 'Nestor-Royce', 'Anya-Waynwood', 'Marillion']
+['Marq-Piper', 'Rickard-Karstark', 'Margaery-Tyrell', 'Senelle', 'Hallis-Mollen', 'Harren-Hoare', 'Nan', 'Colen-of-Greenpools', 'Desmond-Grell', 'Edmure-Tully']
+['Koss', 'Woth', 'Meralyn', 'Mad-Huntsman', 'Dobber', 'Ravella-Swann', 'Ternesio-Terys', 'Yoren', 'Amabel', 'Waif']
+----
+
+
+
+== What algorithms are supported?
+
+
 
 == What's still missing?
 
@@ -71,3 +163,12 @@ These ones are next on the list:
 Also:
 
 * Support directed graphs
+
+== NetworkX vs Neo4j
+
+You can also run an example showing NetworkX and Neo4j side by side:
+
+[source,bash]
+----
+python -m examples.networkx_vs_neo4j
+----
