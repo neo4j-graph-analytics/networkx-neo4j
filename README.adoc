@@ -5,7 +5,7 @@ You should be able to use it as you would NetworkX but algorithms will run again
 
 == Installation
 
-I haven't deployed this to the PyPi yet but you can still install it directly GitHub:
+You can instasl the library by running the following command:
 
 [source, bash]
 ----
