@@ -112,9 +112,9 @@ class BaseGraph:
         return result
 
     harmonic_centrality_query = """\
-    CALL algo.closeness.harmonic.stream($nodeLabel, relationshipType, {
-      direction: direction,
-      graph: graph
+    CALL algo.closeness.harmonic.stream($nodeLabel, $relationshipType, {
+      direction: $direction,
+      graph: $graph
     })
     YIELD nodeId, centrality
     MATCH (n) WHERE id(n) = nodeId
