@@ -11,7 +11,7 @@ class BaseGraph:
         self.identifier_property = config.get("identifier_property", "id")
 
     add_node_query = """\
-    MERGE (:`%s` {`%s`: {value} })
+    MERGE (:`%s` {`%s`: $value })
     """
 
     def add_node(self, value):
@@ -20,7 +20,7 @@ class BaseGraph:
             session.run(query, {"value": value})
 
     add_nodes_query = """\
-    UNWIND {values} AS value
+    UNWIND $value AS value
     MERGE (:`%s` {`%s`: value })
     """
 
@@ -30,8 +30,8 @@ class BaseGraph:
             session.run(query, {"values": values})
 
     add_edge_query = """\
-    MERGE (node1:`%s` {`%s`: {node1} })
-    MERGE (node2:`%s` {`%s`: {node2} })
+    MERGE (node1:`%s` {`%s`: $node1 })
+    MERGE (node2:`%s` {`%s`: $node2 })
     MERGE (node1)-[:`%s`]->(node2)
     """
 
@@ -47,7 +47,7 @@ class BaseGraph:
             session.run(query, {"node1": node1, "node2": node2})
 
     add_edges_query = """\
-    UNWIND {edges} AS edge
+    UNWIND $edges AS edge
     MERGE (node1:`%s` {`%s`: edge[0] })
     MERGE (node2:`%s` {`%s`: edge[1] })
     MERGE (node1)-[:`%s`]->(node2)
@@ -75,9 +75,9 @@ class BaseGraph:
             return session.run(query).peek()["numberOfNodes"]
 
     betweenness_centrality_query = """\
-    CALL algo.betweenness.stream({nodeLabel}, {relationshipType}, {
-        direction: {direction},
-        graph: {graph}
+    CALL algo.betweenness.stream($nodeLabel, $relationshipType, {
+        direction: $direction,
+        graph: $graph
     })
     YIELD nodeId, centrality
     MATCH (n) WHERE id(n) = nodeId
@@ -92,10 +92,10 @@ class BaseGraph:
         return result
 
     closeness_centrality_query = """\
-    CALL algo.closeness.stream({nodeLabel}, {relationshipType}, {
-      direction: {direction},
-      improved: {wfImproved},
-      graph: {graph}
+    CALL algo.closeness.stream($nodeLabel, $relationshipType, {
+      direction: $direction,
+      improved: $wfImproved,
+      graph: $graph
     })
     YIELD nodeId, centrality
     MATCH (n) WHERE id(n) = nodeId
@@ -112,9 +112,9 @@ class BaseGraph:
         return result
 
     harmonic_centrality_query = """\
-    CALL algo.closeness.harmonic.stream({nodeLabel}, {relationshipType}, {
-      direction: {direction},
-      graph: {graph}
+    CALL algo.closeness.harmonic.stream($nodeLabel, relationshipType, {
+      direction: direction,
+      graph: graph
     })
     YIELD nodeId, centrality
     MATCH (n) WHERE id(n) = nodeId
@@ -213,7 +213,7 @@ class BaseGraph:
     CALL algo.shortestPath.stream(source, target, {propertyName}, {
       direction: {direction},
       graph: {graph}
-    }) 
+    })
     YIELD nodeId, cost
     MATCH (n) WHERE id(n) = nodeId
     RETURN n.`%s` AS node, cost
