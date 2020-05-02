@@ -129,11 +129,11 @@ class BaseGraph:
         return result
 
     pagerank_query = """\
-    CALL algo.pageRank.stream({nodeLabel}, {relationshipType}, {
-      direction: {direction},
-      graph: {graph},
-      iterations: {iterations},
-      dampingFactor: {dampingFactor}
+    CALL algo.pageRank.stream($nodeLabel, $relationshipType, {
+      direction: $direction,
+      graph: $graph
+      iterations: $iterations,
+      dampingFactor: $dampingFactor
     })
     YIELD nodeId, score
     MATCH (n) WHERE id(n) = nodeId
@@ -151,9 +151,9 @@ class BaseGraph:
         return result
 
     triangle_count_query = """\
-    CALL algo.triangleCount.stream({nodeLabel}, {relationshipType}, {
-      direction: {direction},
-      graph: {graph}
+    CALL algo.triangleCount.stream($nodeLabel, $relationshipType, {
+      direction: $direction,
+      graph: $graph
     })
     YIELD nodeId, triangles, coefficient
     MATCH (n) WHERE id(n) = nodeId
@@ -175,9 +175,9 @@ class BaseGraph:
         return result
 
     triangle_query = """\
-    CALL algo.triangleCount({nodeLabel}, {relationshipType}, {
-      direction: {direction},
-      graph: {graph},
+    CALL algo.triangleCount($nodeLabel, $relationshipType, {
+      direction: $direction,
+      graph: $graph,
       write: false
     })
     """
@@ -190,9 +190,9 @@ class BaseGraph:
             return result.peek()["averageClusteringCoefficient"]
 
     lpa_query = """\
-    CALL algo.labelPropagation.stream({nodeLabel}, {relationshipType}, {
-      direction: {direction},
-      graph: {graph}
+    CALL algo.labelPropagation.stream($nodeLabel, $relationshipType, {
+      direction: $direction,
+      graph: $graph
     })
     YIELD nodeId, label
     MATCH (n) WHERE id(n) = nodeId
@@ -208,11 +208,11 @@ class BaseGraph:
                 yield set(row["nodes"])
 
     shortest_path_query = """\
-    MATCH (source:`%s` {`%s`: {source} })
-    MATCH (target:`%s` {`%s`: {target} })
-    CALL algo.shortestPath.stream(source, target, {propertyName}, {
-      direction: {direction},
-      graph: {graph}
+    MATCH (source:`%s` {`%s`: $source })
+    MATCH (target:`%s` {`%s`: $target })
+    CALL algo.shortestPath.stream(source, target, $propertyName, {
+      direction: $direction,
+      graph: $graph
     })
     YIELD nodeId, cost
     MATCH (n) WHERE id(n) = nodeId
@@ -256,9 +256,9 @@ class BaseGraph:
         return result
 
     connected_components_query = """\
-    CALL algo.unionFind.stream({nodeLabel}, {relationshipType}, {
-      direction: {direction},
-      graph: {graph}
+    CALL algo.unionFind.stream($nodeLabel, $relationshipType, {
+      direction: $direction,
+      graph: $graph
     })
     YIELD nodeId, setId
     MATCH (n) WHERE id(n) = nodeId
