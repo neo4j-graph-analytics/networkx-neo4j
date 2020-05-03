@@ -75,13 +75,13 @@ class BaseGraph:
             return session.run(query).peek()["numberOfNodes"]
 
     betweenness_centrality_query = """\
-    CALL algo.betweenness.stream($nodeLabel, $relationshipType, {
-        direction: $direction,
-        graph: $graph
-    })
+    CALL gds.alpha.betweenness.stream({
+          nodeProjection: $nodeLabel,
+          relationshipProjection: $relationshipType
+        })
     YIELD nodeId, centrality
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN n.`%s` AS node, centrality
+    RETURN gds.util.asNode(nodeId).`%s` AS node, centrality
+    ORDER BY centrality DESC, node ASC
     """
 
     def betweenness_centrality(self):
@@ -92,14 +92,13 @@ class BaseGraph:
         return result
 
     closeness_centrality_query = """\
-    CALL algo.closeness.stream($nodeLabel, $relationshipType, {
-      direction: $direction,
-      improved: $wfImproved,
-      graph: $graph
+    CALL gds.alpha.closeness.stream({
+        nodeProjection: $nodeLabel,
+        relationshipProjection: $relationshipType
     })
     YIELD nodeId, centrality
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN n.`%s` AS node, centrality
+    RETURN gds.util.asNode(nodeId).`%s` AS node, centrality
+    ORDER BY centrality DESC, node ASC
     """
 
     def closeness_centrality(self, wf_improved=True):
@@ -111,35 +110,16 @@ class BaseGraph:
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
 
-    harmonic_centrality_query = """\
-    CALL algo.closeness.harmonic.stream($nodeLabel, $relationshipType, {
-      direction: $direction,
-      graph: $graph
-    })
-    YIELD nodeId, centrality
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN n.`%s` AS node, centrality
-    """
-
-    def harmonic_centrality(self):
-        with self.driver.session() as session:
-            params = self.base_params()
-            query = self.harmonic_centrality_query % self.identifier_property
-            result = {row["node"]: row["centrality"] for row in session.run(query, params)}
-        return result
-
     pagerank_query = """\
-    CALL algo.pageRank.stream($nodeLabel, $relationshipType, {
-      direction: $direction,
-      graph: $graph
-      iterations: $iterations,
-      dampingFactor: $dampingFactor
-    })
+    CALL gds.pageRank.stream($graph, {
+        nodeProjection: $nodeLabel,
+        relationshipProjection: $relationshipType,
+        maxIterations: $iterations,
+        dampingFactor: $dampingFactor })
     YIELD nodeId, score
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN n.`%s` AS node, score
-    """
-
+    RETURN gds.util.asNode(nodeId).`%s` AS node, score
+    ORDER BY score DESC, node ASC
+"""
     def pagerank(self, alpha, max_iter):
         with self.driver.session() as session:
             params = self.base_params()
@@ -151,18 +131,22 @@ class BaseGraph:
         return result
 
     triangle_count_query = """\
-    CALL algo.triangleCount.stream($nodeLabel, $relationshipType, {
-      direction: $direction,
-      graph: $graph
+    CALL gds.alpha.triangleCount.stream({
+        nodeProjection: $nodeLabel,
+        relationshipProjection: {
+            %s: {
+                orientation: 'UNDIRECTED'
+        }
+      }
     })
     YIELD nodeId, triangles, coefficient
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN n.`%s` AS node, triangles, coefficient
-    """
+    RETURN gds.util.asNode(nodeId).`%s` AS node, triangles, coefficient
+    ORDER BY coefficient DESC"""
 
     def triangles(self):
         with self.driver.session() as session:
             params = self.base_params()
+            query = triangle_count_query % (params['relationshipType'],identifier_property)
             query = self.triangle_count_query % self.identifier_property
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
@@ -175,19 +159,24 @@ class BaseGraph:
         return result
 
     triangle_query = """\
-    CALL algo.triangleCount($nodeLabel, $relationshipType, {
-      direction: $direction,
-      graph: $graph,
-      write: false
+    CALL gds.alpha.triangleCount.stream({
+        nodeProjection: $nodeLabel,
+        relationshipProjection: {
+            %s: {
+                orientation: 'UNDIRECTED'
+        }
+      }
     })
+    YIELD coefficient
+    RETURN avg(coefficient) as averageClusteringCoefficient
     """
 
     def average_clustering(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.triangle_query
-            result = session.run(query, params)
-            return result.peek()["averageClusteringCoefficient"]
+            query = triangle_query % (params['relationshipType'])
+            result = session.run(query,params)
+            result.peek()["averageClusteringCoefficient"]
 
     lpa_query = """\
     CALL algo.labelPropagation.stream($nodeLabel, $relationshipType, {

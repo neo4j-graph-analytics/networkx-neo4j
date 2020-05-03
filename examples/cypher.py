@@ -1,5 +1,4 @@
-from neo4j.v1 import GraphDatabase, basic_auth
-
+from neo4j import GraphDatabase
 import nxneo4j
 
 create_friends_query = """\
@@ -17,7 +16,7 @@ MERGE (ryan)-[:FRIENDS]->(michael)
 
 
 def cypher():
-    driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "neo"))
+    driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
 
     with driver.session() as session:
         session.run(create_friends_query)
