@@ -14,6 +14,14 @@ class BaseGraph:
     MERGE (:`%s` {`%s`: $value })
     """
 
+    def base_params(self):
+        return {
+            "direction": self.direction,
+            "nodeLabel": self.node_label,
+            "relationshipType": self.relationship_type,
+            "graph": self.graph
+        }
+
     def add_node(self, value):
         with self.driver.session() as session:
             query = self.add_node_query % (self.node_label, self.identifier_property)
@@ -111,7 +119,7 @@ class BaseGraph:
         return result
 
     pagerank_query = """\
-    CALL gds.pageRank.stream($graph, {
+    CALL gds.pageRank.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: $relationshipType,
         maxIterations: $iterations,
@@ -187,8 +195,8 @@ class BaseGraph:
         }
       }
     })
-    YIELD nodeId, communityId AS Community
-    RETURN gds.util.asNode(nodeId).`%s` AS Name, Community
+    YIELD nodeId, communityId AS community
+    RETURN gds.util.asNode(nodeId).`%s` AS node, community
     """
 
     def label_propagation(self):
@@ -256,11 +264,3 @@ class BaseGraph:
 
             result = [row["node"] for row in session.run(query, params)]
         return result
-
-    def base_params(self):
-        return {
-            "direction": self.direction,
-            "nodeLabel": self.node_label,
-            "relationshipType": self.relationship_type,
-            "graph": self.graph
-        }
