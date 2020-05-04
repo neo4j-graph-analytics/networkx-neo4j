@@ -146,7 +146,7 @@ class BaseGraph:
     def triangles(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = triangle_count_query % (params['relationshipType'],identifier_property)
+            query = self.triangle_count_query % (params['relationshipType'],identifier_property)
             query = self.triangle_count_query % self.identifier_property
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
@@ -179,33 +179,44 @@ class BaseGraph:
             result.peek()["averageClusteringCoefficient"]
 
     lpa_query = """\
-    CALL algo.labelPropagation.stream($nodeLabel, $relationshipType, {
-      direction: $direction,
-      graph: $graph
+    CALL gds.labelPropagation.stream({
+        nodeProjection: $nodeLabel,
+        relationshipProjection: {
+            %s: {
+                orientation: $direction
+        }
+      }
     })
-    YIELD nodeId, label
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN label, collect(n.`%s`) AS nodes
+    YIELD nodeId, communityId AS Community
+    RETURN gds.util.asNode(nodeId).`%s` AS Name, Community
     """
 
     def label_propagation(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.lpa_query % self.identifier_property
+            query = self.lpa_query % (params['relationshipType'],identifier_property)
 
             for row in session.run(query, params):
                 yield set(row["nodes"])
 
     shortest_path_query = """\
     MATCH (source:`%s` {`%s`: $source })
-    MATCH (target:`%s` {`%s`: $target })
-    CALL algo.shortestPath.stream(source, target, $propertyName, {
-      direction: $direction,
-      graph: $graph
+    MATCH (target:`%s`   {`%s`: $target })
+
+    CALL gds.alpha.shortestPath.stream({
+      nodeProjection: $nodeLabel,
+      relationshipProjection: {
+        %s: {
+            orientation: $direction,
+            properties: $propertyName
+    }
+    },
+      startNode: source,
+      endNode: target,
+      weightProperty: $propertyName
     })
     YIELD nodeId, cost
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN n.`%s` AS node, cost
+    RETURN gds.util.asNode(nodeId).`%s` AS node, cost
     """
 
     def shortest_weighted_path(self, source, target, weight):
@@ -220,6 +231,7 @@ class BaseGraph:
                 self.identifier_property,
                 self.node_label,
                 self.identifier_property,
+                self.relationshipType,
                 self.identifier_property
             )
 
@@ -238,29 +250,12 @@ class BaseGraph:
                 self.identifier_property,
                 self.node_label,
                 self.identifier_property,
+                self.relationshipType,
                 self.identifier_property
             )
 
             result = [row["node"] for row in session.run(query, params)]
         return result
-
-    connected_components_query = """\
-    CALL algo.unionFind.stream($nodeLabel, $relationshipType, {
-      direction: $direction,
-      graph: $graph
-    })
-    YIELD nodeId, setId
-    MATCH (n) WHERE id(n) = nodeId
-    RETURN setId, collect(n.`%s`) AS nodes
-    """
-
-    def connected_components(self):
-        with self.driver.session() as session:
-            params = self.base_params()
-            query = self.lpa_query % self.identifier_property
-
-            for row in session.run(query, params):
-                yield set(row["nodes"])
 
     def base_params(self):
         return {
