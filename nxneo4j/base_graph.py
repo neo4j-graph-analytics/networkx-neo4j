@@ -204,17 +204,17 @@ class BaseGraph:
     MATCH (target:`%s`   {`%s`: $target })
 
     CALL gds.alpha.shortestPath.stream({
-      nodeProjection: $nodeLabel,
-      relationshipProjection: {
-        %s: {
-            orientation: $direction,
-            properties: $propertyName
-    }
-    },
-      startNode: source,
-      endNode: target,
-      weightProperty: $propertyName
-    })
+        nodeProjection: $nodeLabel,
+        relationshipProjection: {
+            %s: {
+                orientation: $direction,
+                properties: $propertyName
+                }
+            },
+        startNode: source,
+        endNode: target,
+        weightProperty: $propertyName
+        })
     YIELD nodeId, cost
     RETURN gds.util.asNode(nodeId).`%s` AS node, cost
     """
