@@ -1,12 +1,11 @@
 import networkx as nx
-from neo4j.v1 import GraphDatabase, basic_auth
+from neo4j import GraphDatabase
 
 import nxneo4j
 
 networkx_functions = {
     "betweenness_centrality": nx.betweenness_centrality,
     "closeness_centrality": nx.closeness_centrality,
-    "harmonic_centrality": nx.harmonic_centrality,
     "pagerank": nx.pagerank,
     "triangles": nx.triangles,
     "clustering": nx.clustering,
@@ -20,7 +19,6 @@ networkx_functions = {
 neo4j_functions = {
     "betweenness_centrality": nxneo4j.betweenness_centrality,
     "closeness_centrality": nxneo4j.closeness_centrality,
-    "harmonic_centrality": nxneo4j.harmonic_centrality,
     "pagerank": nxneo4j.pagerank,
     "triangles": nxneo4j.triangles,
     "clustering": nxneo4j.clustering,
@@ -31,7 +29,9 @@ neo4j_functions = {
     "number_connected_components": nxneo4j.number_connected_components
 }
 
-
+driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
+G = nxneo4j.Graph(driver)
+functions = neo4j_functions
 def execute_graph(G, functions):
     G.add_node(1)
     G.add_nodes_from([2, 3])
@@ -50,10 +50,6 @@ def execute_graph(G, functions):
     print("Closeness (WF): {0}".format(closeness(G, wf_improved=True)))
     print("Closeness (no WF): {0}".format(closeness(G, wf_improved=False)))
     print("Closeness (one node): {0}".format(closeness(G, 1, wf_improved=False)))
-
-    harmonic = functions["harmonic_centrality"]
-    print("Harmonic (default): {0}".format(harmonic(G)))
-    print("Harmonic (nbunch): {0}".format(harmonic(G, nbunch=[1, 2, 3])))
 
     pagerank = functions["pagerank"]
     print("PageRank: {0}".format(pagerank(G)))

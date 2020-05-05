@@ -28,7 +28,7 @@ class BaseGraph:
             session.run(query, {"value": value})
 
     add_nodes_query = """\
-    UNWIND $value AS value
+    UNWIND $values AS value
     MERGE (:`%s` {`%s`: value })
     """
 
@@ -154,15 +154,14 @@ class BaseGraph:
     def triangles(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.triangle_count_query % (params['relationshipType'],identifier_property)
-            query = self.triangle_count_query % self.identifier_property
+            query = self.triangle_count_query % (self.relationship_type,self.identifier_property)
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
 
     def clustering(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.triangle_count_query % self.identifier_property
+            query = self.triangle_count_query % (self.relationship_type,self.identifier_property)
             result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
         return result
 
@@ -182,7 +181,7 @@ class BaseGraph:
     def average_clustering(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = triangle_query % (params['relationshipType'])
+            query = self.triangle_query % (self.relationship_type)
             result = session.run(query,params)
             result.peek()["averageClusteringCoefficient"]
 
@@ -202,7 +201,7 @@ class BaseGraph:
     def label_propagation(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.lpa_query % (params['relationshipType'],identifier_property)
+            query = self.lpa_query % (self.relationship_type,self.identifier_property)
 
             for row in session.run(query, params):
                 yield set(row["nodes"])
