@@ -1,11 +1,11 @@
 = networkx-neo4j
 
-This library provides NetworkX API for https://github.com/neo4j-contrib/neo4j-graph-algorithms[Neo4j Graph Algorithms^].
+This library provides NetworkX API for https://github.com/neo4j/graph-data-science/[Neo4j Graph Data Science^].
 You should be able to use it as you would NetworkX but algorithms will run against Neo4j.
 
 == Installation
 
-You can instasl the library by running the following command:
+You can install the library by running the following command:
 
 [source, bash]
 ----
@@ -13,7 +13,9 @@ pip install networkx-neo4j
 ----
 
 You'll also need to install Neo4j and the Graph Algorithms library.
-My colleague Jennifer Reif has https://medium.com/neo4j/explore-new-worlds-adding-plugins-to-neo4j-26e6a8e5d37e[a detailed post explaining how to do this^].
+
+image:images/plugin.png[plugin]
+image:images/gds.png[gds]
 
 == Usage
 
@@ -24,13 +26,9 @@ First let's import our libraries and create an instance of the Neo4j driver:
 [source, python]
 ----
 import nxneo4j
-import os
-from neo4j.v1 import GraphDatabase, basic_auth
+from neo4j import GraphDatabase
 
-user_name = os.environ.get("NEO4J_USER", "neo4j")
-password = os.environ.get("NEO4J_PASSWORD", "neo")
-
-driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth(user_name, password))
+driver = GraphDatabase.driver("bolt://localhost", auth=(user_name, password))
 ----
 
 And now let's create a `Graph` object around the driver:
