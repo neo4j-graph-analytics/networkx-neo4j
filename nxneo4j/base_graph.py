@@ -84,8 +84,14 @@ class BaseGraph:
 
     betweenness_centrality_query = """\
     CALL gds.alpha.betweenness.stream({
-          nodeProjection: $nodeLabel,
-          relationshipProjection: $relationshipType
+        nodeProjection: $nodeLabel,
+        relationshipProjection: {
+            relType: {
+                type: $relationshipType,
+                orientation: $direction,
+                properties: {}
+                }
+            }
         })
     YIELD nodeId, centrality
     RETURN gds.util.asNode(nodeId).`%s` AS node, centrality
@@ -102,7 +108,12 @@ class BaseGraph:
     closeness_centrality_query = """\
     CALL gds.alpha.closeness.stream({
         nodeProjection: $nodeLabel,
-        relationshipProjection: $relationshipType
+        relationshipProjection: {
+            relType: {
+            type: $relationshipType,
+            orientation: $direction,
+            properties: {}
+        }
     })
     YIELD nodeId, centrality
     RETURN gds.util.asNode(nodeId).`%s` AS node, centrality
@@ -118,23 +129,34 @@ class BaseGraph:
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
         return result
 
+
     pagerank_query = """\
     CALL gds.pageRank.stream({
-        nodeProjection: $nodeLabel,
-        relationshipProjection: $relationshipType,
-        maxIterations: $iterations,
-        dampingFactor: $dampingFactor })
+      nodeProjection: $nodeLabel,
+      relationshipProjection: {
+        relType: {
+          type: $relationshipType,
+          orientation: $direction,
+          properties: {}
+        }
+      },
+      relationshipWeightProperty: null,
+      dampingFactor: $dampingFactor,
+      maxIterations: $iterations
+    })
     YIELD nodeId, score
     RETURN gds.util.asNode(nodeId).`%s` AS node, score
     ORDER BY score DESC, node ASC
-"""
-    def pagerank(self, alpha, max_iter):
+    """
+
+    def pagerank(self, alpha=0.85, max_iter=20):
         with self.driver.session() as session:
             params = self.base_params()
+
             params["iterations"] = max_iter
             params["dampingFactor"] = alpha
 
-            query = self.pagerank_query % self.identifier_property
+            query = self.pagerank_query % (self.identifier_property)
             result = {row["node"]: row["score"] for row in session.run(query, params)}
         return result
 
@@ -169,13 +191,18 @@ class BaseGraph:
     CALL gds.alpha.triangleCount.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
-            %s: {
-                orientation: 'UNDIRECTED'
-        }
-      }
+            relType: {
+                type: $relationshipType,
+                orientation: $direction,
+                properties: {}
+            }
+        },
+        clusteringCoefficientProperty: 'clusteringCoefficient'
     })
-    YIELD coefficient
-    RETURN avg(coefficient) as averageClusteringCoefficient
+    YIELD nodeId, triangles, coefficient
+    WITH gds.util.asNode(nodeId) AS node, coefficient, triangles
+    RETURN node, triangles, coefficient
+    ORDER BY triangles DESC
     """
 
     def average_clustering(self):
@@ -183,45 +210,51 @@ class BaseGraph:
             params = self.base_params()
             query = self.triangle_query % (self.relationship_type)
             result = session.run(query,params)
-            result.peek()["averageClusteringCoefficient"]
+            result.peek()["clusteringCoefficient"]
 
     lpa_query = """\
     CALL gds.labelPropagation.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
-            %s: {
-                orientation: $direction
-        }
-      }
+            relType: {
+                type: $relationshipType,
+                orientation: $direction,
+                properties: {}
+            }
+        },
+        relationshipWeightProperty: null
     })
     YIELD nodeId, communityId AS community
-    RETURN gds.util.asNode(nodeId).`%s` AS node, community
+    WITH gds.util.asNode(nodeId).`%s` AS node, community
+    RETURN node, community
+    ORDER BY community DESC
     """
 
     def label_propagation(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.lpa_query % (self.relationship_type,self.identifier_property)
+            query = self.lpa_query % (self.identifier_property)
 
             for row in session.run(query, params):
                 yield set(row["nodes"])
 
     shortest_path_query = """\
-    MATCH (source:`%s` {`%s`: $source })
+    MATCH (source:`%s`   {`%s`: $source })
     MATCH (target:`%s`   {`%s`: $target })
 
     CALL gds.alpha.shortestPath.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
-            %s: {
+            relType: {
+                type: $relationshipType,
                 orientation: $direction,
-                properties: $propertyName
-                }
-            },
+                properties: {$propertyName}
+            }
+        },
         startNode: source,
         endNode: target,
-        weightProperty: $propertyName
-        })
+        relationshipWeightProperty: null
+    })
     YIELD nodeId, cost
     RETURN gds.util.asNode(nodeId).`%s` AS node, cost
     """
@@ -238,7 +271,6 @@ class BaseGraph:
                 self.identifier_property,
                 self.node_label,
                 self.identifier_property,
-                self.relationshipType,
                 self.identifier_property
             )
 
@@ -250,7 +282,7 @@ class BaseGraph:
             params = self.base_params()
             params["source"] = source
             params["target"] = target
-            params["propertyName"] = None
+            params["propertyName"] = ''
 
             query = self.shortest_path_query % (
                 self.node_label,
