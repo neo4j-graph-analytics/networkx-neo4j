@@ -132,17 +132,17 @@ class BaseGraph:
 
     pagerank_query = """\
     CALL gds.pageRank.stream({
-      nodeProjection: $nodeLabel,
-      relationshipProjection: {
-        relType: {
-          type: $relationshipType,
-          orientation: $direction,
-          properties: {}
-        }
-      },
-      relationshipWeightProperty: null,
-      dampingFactor: $dampingFactor,
-      maxIterations: $iterations
+        nodeProjection: $nodeLabel,
+        relationshipProjection: {
+            relType: {
+                type: $relationshipType,
+                orientation: $direction,
+                properties: {}
+            }
+        },
+        relationshipWeightProperty: null,
+        dampingFactor: $dampingFactor,
+        maxIterations: $iterations
     })
     YIELD nodeId, score
     RETURN gds.util.asNode(nodeId).`%s` AS node, score
