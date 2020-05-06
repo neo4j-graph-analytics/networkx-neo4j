@@ -9,11 +9,8 @@ networkx_functions = {
     "pagerank": nx.pagerank,
     "triangles": nx.triangles,
     "clustering": nx.clustering,
-    "average_clustering": nx.average_clustering,
     "label_propagation_communities": nx.algorithms.community.label_propagation_communities,
     "shortest_path": nx.shortest_path,
-    "connected_components": nx.connected_components,
-    "number_connected_components": nx.number_connected_components
 }
 
 neo4j_functions = {
@@ -22,11 +19,8 @@ neo4j_functions = {
     "pagerank": nxneo4j.pagerank,
     "triangles": nxneo4j.triangles,
     "clustering": nxneo4j.clustering,
-    "average_clustering": nxneo4j.average_clustering,
     "label_propagation_communities": nxneo4j.community.label_propagation_communities,
     "shortest_path": nxneo4j.shortest_path,
-    "connected_components": nxneo4j.connected_components,
-    "number_connected_components": nxneo4j.number_connected_components
 }
 
 driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
@@ -60,23 +54,11 @@ def execute_graph(G, functions):
     clustering = functions["clustering"]
     print("Clustering Coefficient: {0}".format(clustering(G)))
 
-    average_clustering = functions["average_clustering"]
-    print("Average Clustering Coefficient: {0}".format(average_clustering(G)))
-
     lpa = functions["label_propagation_communities"]
     print("Label Propagation: {0}".format(list(lpa(G))))
 
     shortest_path = functions["shortest_path"]
-    print("Shortest Path: {0}".format(shortest_path(G, 1, 5, 'weight')))
     print("Single Shortest Path: {0}".format(shortest_path(G, 1)))
-
-    connected_components = functions["connected_components"]
-    print("Connected Components: {0}".format(list(connected_components(G))))
-
-    number_connected_components = functions["number_connected_components"]
-    print("# Connected Components: {0}".format(number_connected_components(G)))
-
-
 
 if __name__ == '__main__':
     print("Neo4j")

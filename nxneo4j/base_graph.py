@@ -11,7 +11,7 @@ class BaseGraph:
         self.identifier_property = config.get("identifier_property", "id")
 
     add_node_query = """\
-    MERGE (:`%s` {`%s`: $value })
+    MERGE (:`%s` {`%s`:  $value })
     """
 
     def base_params(self):
@@ -114,16 +114,15 @@ class BaseGraph:
             orientation: $direction,
             properties: {}
         }
-    })
+    }})
     YIELD nodeId, centrality
     RETURN gds.util.asNode(nodeId).`%s` AS node, centrality
     ORDER BY centrality DESC, node ASC
     """
 
-    def closeness_centrality(self, wf_improved=True):
+    def closeness_centrality(self,wf_improved=True):
         with self.driver.session() as session:
             params = self.base_params()
-            params["wfImproved"] = wf_improved
             query = self.closeness_centrality_query % self.identifier_property
 
             result = {row["node"]: row["centrality"] for row in session.run(query, params)}
@@ -187,31 +186,6 @@ class BaseGraph:
             result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
         return result
 
-    triangle_query = """\
-    CALL gds.alpha.triangleCount.stream({
-        nodeProjection: $nodeLabel,
-        relationshipProjection: {
-            relType: {
-                type: $relationshipType,
-                orientation: $direction,
-                properties: {}
-            }
-        },
-        clusteringCoefficientProperty: 'clusteringCoefficient'
-    })
-    YIELD nodeId, triangles, coefficient
-    WITH gds.util.asNode(nodeId) AS node, coefficient, triangles
-    RETURN node, triangles, coefficient
-    ORDER BY triangles DESC
-    """
-
-    def average_clustering(self):
-        with self.driver.session() as session:
-            params = self.base_params()
-            query = self.triangle_query % (self.relationship_type)
-            result = session.run(query,params)
-            result.peek()["clusteringCoefficient"]
-
     lpa_query = """\
     CALL gds.labelPropagation.stream({
         nodeProjection: $nodeLabel,
@@ -225,9 +199,8 @@ class BaseGraph:
         relationshipWeightProperty: null
     })
     YIELD nodeId, communityId AS community
-    WITH gds.util.asNode(nodeId).`%s` AS node, community
-    RETURN node, community
-    ORDER BY community DESC
+    MATCH (n) WHERE id(n) = nodeId
+    RETURN community, collect(n.`%s`) AS nodes
     """
 
     def label_propagation(self):
@@ -248,12 +221,12 @@ class BaseGraph:
             relType: {
                 type: $relationshipType,
                 orientation: $direction,
-                properties: {$propertyName}
+                properties: {}
             }
         },
         startNode: source,
         endNode: target,
-        relationshipWeightProperty: null
+        relationshipWeightProperty: $propertyName
     })
     YIELD nodeId, cost
     RETURN gds.util.asNode(nodeId).`%s` AS node, cost
