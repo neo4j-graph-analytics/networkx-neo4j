@@ -10,10 +10,6 @@ class BaseGraph:
         self.graph = config.get("graph", "heavy")
         self.identifier_property = config.get("identifier_property", "id")
 
-    add_node_query = """\
-    MERGE (:`%s` {`%s`:  $value })
-    """
-
     def base_params(self):
         return {
             "direction": self.direction,
@@ -22,10 +18,14 @@ class BaseGraph:
             "graph": self.graph
         }
 
-    def add_node(self, value):
+    add_node_query = """\
+    MERGE (:`%s` {`%s`:  $node })
+    """
+
+    def add_node(self, node):
         with self.driver.session() as session:
             query = self.add_node_query % (self.node_label, self.identifier_property)
-            session.run(query, {"value": value})
+            session.run(query, {"node": node})
 
     add_nodes_query = """\
     UNWIND $values AS value
@@ -163,11 +163,12 @@ class BaseGraph:
     CALL gds.alpha.triangleCount.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
-            %s: {
-                orientation: 'UNDIRECTED'
-        }
-      }
-    })
+            relType: {
+            type: $relationshipType,
+            orientation: $direction,
+            properties: {}
+            }
+    }})
     YIELD nodeId, triangles, coefficient
     RETURN gds.util.asNode(nodeId).`%s` AS node, triangles, coefficient
     ORDER BY coefficient DESC"""
@@ -175,14 +176,14 @@ class BaseGraph:
     def triangles(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.triangle_count_query % (self.relationship_type,self.identifier_property)
+            query = self.triangle_count_query % (self.identifier_property)
             result = {row["node"]: row["triangles"] for row in session.run(query, params)}
         return result
 
     def clustering(self):
         with self.driver.session() as session:
             params = self.base_params()
-            query = self.triangle_count_query % (self.relationship_type,self.identifier_property)
+            query = self.triangle_count_query % (self.identifier_property)
             result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
         return result
 
@@ -262,7 +263,6 @@ class BaseGraph:
                 self.identifier_property,
                 self.node_label,
                 self.identifier_property,
-                self.relationshipType,
                 self.identifier_property
             )
 

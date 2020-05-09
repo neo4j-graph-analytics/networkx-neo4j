@@ -25,184 +25,69 @@ First let's import our libraries and create an instance of the Neo4j driver:
 
 [source, python]
 ----
-import nxneo4j
-from neo4j import GraphDatabase
+>>> from neo4j import GraphDatabase
+>>> import nxneo4j as nx
 
-driver = GraphDatabase.driver("bolt://localhost", auth=(user_name, password))
+>>> driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
 ----
-
-And now let's create a `Graph` object around the driver:
-
+For undirected Graphs:
 [source, python]
 ----
-G = nxneo4j.Graph(driver)
+>>> G = nx.Graph(driver)
 ----
-
-We can create a little graph:
-
-[source,python]
-----
-G.add_node(1)
-G.add_nodes_from([2, 3])
-
-G.add_edge(1, 2)
-G.add_edge(4, 5)
-G.add_edges_from([(1, 2), (1, 3), (2, 3)])
-----
-
-And run algorithms against it:
-
-[source,python]
-----
->>> list(nxneo4j.community.label_propagation_communities(G))
-[{1, 2, 3}, {4, 5}]
-----
-
-== Graph of Thrones
-
-We can also work with an existing graph.
-You can import this dataset by playing the following guide from the Neo4j browser:
-
-```
-:play http://guides.neo4j.com/data_science/01_eda.html
-```
-
-And then click through the sections that import the data.
-This graph contains nodes with a `Character` label that have `INTERACTS1`, `INTERACTS2`, `INTERACTS3`, and `INTERACTS45` relationships between them.
-
-Now let's create a `Graph` object that knows about this graph.
-First we'll create a config map that we'll pass in to the `Graph()` constructor.
-
+For directed Graphs:
 [source, python]
 ----
-config = {
-    "node_label": "Character",
-    "relationship_type": None,
-    "identifier_property": "name"
-}
+>>> G = nx.DiGraph(driver)
 ----
 
-We set:
-
-* `node_label` is `Character` so that we'll only consider nodes with that label
-* `relationship_type` is `None` so that we'll consider all relationship types in the graph
-* `identifier_property` is the node property that we'll use to identify each node from the networkx-neo4j API
-
+The available functions in `nxneo4j` are:
 [source, python]
 ----
-G = nxneo4j.Graph(driver, config)
+# ADD ONE NODE
+G.add_node(node)
+node: str, int
+>>> G.add_node(1)
+
+# ADD MULTIPLE NODES
+G.add_nodes_from(value)
+values: list
+>>> G.add_nodes_from([1, 2, 3, 4])
+
+# ADD ONE EDGE
+G.add_edge(node1,node2)
+node1: str, int
+node2: str, int
+>>> G.add_edge(1,2)
+
+#ADD MULTIPLE EDGES
+G.add_edges_from(values)
+values: list of tuples
+>>> G.add_edges_from([(1, 2),(2, 3),(3, 4)])
 ----
 
-We can find the most influential characters by executing the PageRank algorithm against this graph like this:
-
+The available algoritms in `nxneo4j` are:
 [source, python]
 ----
-sorted_pagerank = sorted(nxneo4j.centrality.pagerank(G).items(), key=lambda x: x[1], reverse=True)
-for character, score in sorted_pagerank[:10]:
-    print(character, score)
+>>> nx.betweenness_centrality(G)
+{3: 4.0, 4: 3.0, 1: 0.0, 2: 0.0, 5: 0.0}
 
-Tyrion-Lannister 11.312183000000001
-Stannis-Baratheon 7.211595999999998
-Tywin-Lannister 6.997056000000001
-Varys 6.228078
-Theon-Greyjoy 4.6472225
-Sansa-Stark 4.234794
-Walder-Frey 3.2763000000000004
-Robb-Stark 3.0024044999999995
-Samwell-Tarly 2.9787575000000004
-Jon-Snow 2.9183989999999995
-----
+>>> nx.closeness_centrality(G)
+{3: 0.8, 4: 0.6666666666666666, 1: 0.5714285714285714, 2: 0.5714285714285714, 5: 0.4444444444444444}
 
-Hopefully there are some familiar names there!
+>>> nx.pagerank(G)
+{3: 1.4170146573314513, 4: 1.0629939728840803, 1: 0.9591085771210682, 2: 0.9591085771210682, 5: 0.6017724112363687}
 
-What about if we want to find the shortest path between characters?
+>>> nx.triangles(G)
+{1: 1, 2: 1, 3: 1, 4: 0, 5: 0}
 
-[source, python]
-----
-nxneo4j.path_finding.shortest_path(G, "Tyrion-Lannister", "Hodor")
+>>> nx.clustering(G)
+{1: 1.0, 2: 1.0, 3: 0.3333333333333333, 4: 0.0, 5: 0.0}
 
-['Tyrion-Lannister', 'Robb-Stark', 'Hodor']
-----
+>>> list(nx.community.label_propagation_communities(G))
+[{1, 2, 3, 4, 5}]
 
-We can also partition the characters into communities:
+>>> nx.shortest_path(G, source=1, target=5)
+[1, 3, 4, 5]
 
-[source, python]
-----
-communities = nxneo4j.community.label_propagation_communities(G)
-sorted_communities = sorted(communities, key=lambda x: len(x), reverse=True)
-for community in sorted_communities[:10]:
-    print(list(community)[:10])
-
-['Josmyn-Peckledon', 'Belwas', 'Rafford', 'Polliver', 'Petyr-Frey', 'Tristifer-IV-Mudd', 'Jeyne-Heddle', 'Urswyck', 'Falyse-Stokeworth', 'Hoster-Blackwood']
-['Trystane-Martell', 'Blue-Bard', 'Matthos-Seaworth', 'Marya-Seaworth', 'Mors-Umber', 'Jaehaerys-I-Targaryen', 'Myrcella-Baratheon', 'Justin-Massey', 'Denys-Mallister', 'Clayton-Suggs']
-['Oberyn-Martell', 'Nurse', 'Tommen-Baratheon', 'Tanda-Stokeworth', 'Garlan-Tyrell', 'Morgo', 'Qavo-Nogarys', 'Moon-Boy', 'Leonette-Fossoway', 'Allar-Deem']
-['Owen', 'Jon-Snow', 'Gerrick-Kingsblood', 'Lanna-(Happy-Port)', 'Maekar-I-Targaryen', 'Gorne', 'Arron', 'Arson', 'Satin', 'Rast']
-['Asha-Greyjoy', 'Palla', 'Squirrel', 'Tristifer-Botley', 'Yellow-Dick', 'Lorren', 'Jason-Mallister', 'Benfred-Tallhart', 'Kyra', 'Gynir']
-['Harras-Harlaw', 'Baelor-Blacktyde', 'Dunstan-Drumm', 'Ralf-Stonehouse', 'Gorold-Goodbrother', 'Rodrik-Harlaw', 'Talbert-Serry', 'Sigfryd-Harlaw', 'Rodrik-Sparr', 'Wulfe']
-['Alliser-Thorne', 'Othell-Yarwyck', 'Jaremy-Rykker', 'Ragwyle', 'Craster', 'Clubfoot-Karl', 'Blane', 'Donal-Noye', 'Halder', 'Mag-Mar-Tun-Doh-Weg']
-['Tomard', 'Horton-Redfort', 'Lothor-Brune', 'Myranda-Royce', 'Grisel', 'Merrett-Frey', 'Loras-Tyrell', 'Nestor-Royce', 'Anya-Waynwood', 'Marillion']
-['Marq-Piper', 'Rickard-Karstark', 'Margaery-Tyrell', 'Senelle', 'Hallis-Mollen', 'Harren-Hoare', 'Nan', 'Colen-of-Greenpools', 'Desmond-Grell', 'Edmure-Tully']
-['Koss', 'Woth', 'Meralyn', 'Mad-Huntsman', 'Dobber', 'Ravella-Swann', 'Ternesio-Terys', 'Yoren', 'Amabel', 'Waif']
-----
-
-== What algorithms are supported?
-
-Centrality:
-
-[source, python]
-----
-for module in dir(nxneo4j.centrality):
-    if not module.startswith("__"):
-        print(module)
-
-betweenness_centrality
-closeness_centrality
-harmonic_centrality
-pagerank
-----
-
-Community Detection:
-
-[source, python]
-----
-for module in dir(nxneo4j.community):
-    if not module.startswith("__"):
-        print(module)
-
-average_clustering
-clustering
-connected_components
-label_propagation_communities
-number_connected_components
-triangles
-----
-
-Path Finding:
-
-[source, python]
-----
-for module in dir(nxneo4j.path_finding):
-    if not module.startswith("__"):
-        print(module)
-
-shortest_path
-----
-
-Shortest Path currently only works if you provide both `Target` and `Source` nodes.
-
-== What's still missing?
-
-Not all the algorithms are translated yet.
-These ones are next on the list:
-
-* Shortest path
-* A-star
-
-== NetworkX vs Neo4j
-
-You can also run an example showing NetworkX and Neo4j side by side:
-
-[source,bash]
-----
-python -m examples.networkx_vs_neo4j
 ----
