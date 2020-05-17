@@ -1,4 +1,26 @@
-def shortest_path(G, source=None, target=None, weight=None):
+"""TEST SETUP
+import sys
+sys.path.append("../")  #included to reach to the parent directory
+
+from neo4j import GraphDatabase
+import nxneo4j as nx
+
+# to fix the default port run $kill $(lsof -ti:7687) OR
+
+driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
+G = nx.Graph(driver)
+
+G.delete_all()
+
+data = [(1, 2),(2, 3),(3, 4)]
+G.add_edges_from(data)
+
+import networkx
+_G = networkx.Graph()
+_G.add_edges_from(data)
+"""
+
+def shortest_weighted_path(G,source, target, weight):
     if source is None:
         if target is None:
             # Find paths between all pairs.
@@ -30,10 +52,46 @@ def shortest_path(G, source=None, target=None, weight=None):
                 #                                        weight=weight)
                 paths = []
         else:
-            # Find shortest source-target path.
-            if weight is None:
-                paths = G.shortest_path(source, target)
-            else:
-                paths = G.shortest_weighted_path(source, target, weight)
 
+            query = """\
+            MATCH (source:%s   {%s: $source })
+            MATCH (target:%s   {%s: $target })
+
+            CALL gds.alpha.shortestPath.stream({
+                nodeProjection: $nodeLabel,
+                relationshipProjection: {
+                    relType: {
+                        type: $relationshipType,
+                        orientation: $direction,
+                        properties: {}
+                    }
+                },
+                startNode: source,
+                endNode: target,
+                relationshipWeightProperty: $propertyName
+            })
+            YIELD nodeId, cost
+            RETURN gds.util.asNode(nodeId).%s AS node, cost
+            """ % (
+                G.node_label,
+                G.identifier_property,
+                G.node_label,
+                G.identifier_property,
+                G.identifier_property
+            )
+
+            with G.driver.session() as session:
+                params = G.base_params()
+                params["source"] = source
+                params["target"] = target
+                params["propertyName"] = weight
+
+                paths = [row["node"] for row in session.run(query, params)]
     return paths
+
+def shortest_path(G,source, target):
+    return shortest_weighted_path(G,source, target, weight='')
+"""TEST OUTPUT
+nx.shortest_weighted_path(G, source=1, target=3, weight='')
+nx.shortest_path(G, source=1, target=3)
+"""
