@@ -1,11 +1,7 @@
-"""TEST SETUP
-import sys
-sys.path.append("../")  #included to reach to the parent directory
+"""Get Centrality related metrics
 
 from neo4j import GraphDatabase
 import nxneo4j as nx
-
-# to fix the default port run $kill $(lsof -ti:7687) OR
 
 driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
 G = nx.Graph(driver)
@@ -19,7 +15,8 @@ import networkx
 _G = networkx.Graph()
 _G.add_edges_from(data)
 """
-
+# test only (import sys;sys.path.append("../"))  #the purpose is to reach to the parent directory
+# to fix the default port run $kill $(lsof -ti:7687)
 def betweenness_centrality(G, k=None, normalized=True, weight=None, endpoints=False, seed=None):
     # doesn't currently support `weight`, `k`, `endpoints`, `seed`
 
@@ -109,7 +106,7 @@ def pagerank(G, alpha=0.85, personalization=None,  max_iter=100, tol=1.0e-8, nst
     with G.driver.session() as session:
         result = {row["node"]: row["score"] for row in session.run(query, params)}
     return result
-    
+
 """TEST OUTPUT
 nx.pagerank(G)
 networkx.pagerank(_G)
