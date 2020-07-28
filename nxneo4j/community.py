@@ -1,11 +1,7 @@
-"""TEST SETUP
-import sys
-sys.path.append("../")  #included to reach to the parent directory
-
+"""Get Community related metrics
+TEST SETUP
 from neo4j import GraphDatabase
 import nxneo4j as nx
-
-# to fix the default port run $kill $(lsof -ti:7687) OR
 
 driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
 G = nx.Graph(driver)
@@ -14,10 +10,6 @@ G.delete_all()
 
 data = [(1, 2),(2, 3),(3, 4)]
 G.add_edges_from(data)
-
-import networkx
-_G = networkx.Graph()
-_G.add_edges_from(data)
 """
 
 def triangles(G, nodes=None):
@@ -44,10 +36,10 @@ def triangles(G, nodes=None):
         return {k: v for k, v in result.items() if k in nodes}
     return result
 
-"""TEST OUTPUT
-nx.triangles(G)
-networkx.triangles(_G)
-"""
+    """TEST OUTPUT
+    nx.triangles(G)
+    networkx.triangles(_G)
+    """
 
 def clustering(G, nodes=None, weight=None):
     # doesn't currently support `weight`
@@ -71,10 +63,10 @@ def clustering(G, nodes=None, weight=None):
         result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
     return result
 
-"""TEST OUTPUT
-nx.clustering(G)
-networkx.clustering(_G)
-"""
+    """TEST OUTPUT
+    nx.clustering(G)
+    networkx.clustering(_G)
+    """
 
 
 def label_propagation_communities(G):
@@ -102,10 +94,10 @@ def label_propagation_communities(G):
         for row in session.run(query, params):
             yield set(row["nodes"])
 
-"""TEST OUTPUT
-nx.label_propagation_communities(G)
-networkx.networkx.algorithms.community.label_propagation.label_propagation_communities(_G)
-"""
+    """TEST OUTPUT
+    nx.label_propagation_communities(G)
+    networkx.networkx.algorithms.community.label_propagation.label_propagation_communities(_G)
+    """
 
 
 def connected_components(G):
@@ -136,7 +128,7 @@ def connected_components(G):
 def number_connected_components(G):
     return sum(1 for cc in connected_components(G))
 
-"""TEST OUTPUT
-nx.connected_components(G)
-nx.number_connected_components(G)
-"""
+    """TEST OUTPUT
+    nx.connected_components(G)
+    nx.number_connected_components(G)
+    """

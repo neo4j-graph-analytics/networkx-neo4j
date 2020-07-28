@@ -1,11 +1,7 @@
-"""TEST SETUP
-import sys
-sys.path.append("../")  #included to reach to the parent directory
-
+"""Get Path-finding related metrics
+TEST SETUP
 from neo4j import GraphDatabase
 import nxneo4j as nx
-
-# to fix the default port run $kill $(lsof -ti:7687) OR
 
 driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
 G = nx.Graph(driver)
@@ -14,10 +10,6 @@ G.delete_all()
 
 data = [(1, 2),(2, 3),(3, 4)]
 G.add_edges_from(data)
-
-import networkx
-_G = networkx.Graph()
-_G.add_edges_from(data)
 """
 
 def shortest_weighted_path(G,source, target, weight):
@@ -91,7 +83,7 @@ def shortest_weighted_path(G,source, target, weight):
 
 def shortest_path(G,source, target):
     return shortest_weighted_path(G,source, target, weight='')
-"""TEST OUTPUT
-nx.shortest_weighted_path(G, source=1, target=3, weight='')
-nx.shortest_path(G, source=1, target=3)
-"""
+    """TEST OUTPUT
+    nx.shortest_weighted_path(G, source=1, target=3, weight='')
+    nx.shortest_path(G, source=1, target=3)
+    """
