@@ -14,7 +14,7 @@ G.add_edges_from(data)
 
 def triangles(G, nodes=None):
     query = """\
-    CALL gds.alpha.triangleCount.stream({
+    CALL gds.triangleCount.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
             relType: {
@@ -44,7 +44,7 @@ def triangles(G, nodes=None):
 def clustering(G, nodes=None, weight=None):
     # doesn't currently support `weight`
     query = """\
-    CALL gds.alpha.triangleCount.stream({
+    CALL gds.triangleCount.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
             relType: {
