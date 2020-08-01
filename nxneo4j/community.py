@@ -23,14 +23,14 @@ def triangles(G, nodes=None):
             properties: {}
             }
     }})
-    YIELD nodeId, triangles, coefficient
-    RETURN gds.util.asNode(nodeId).%s AS node, triangles, coefficient
+    YIELD nodeId, triangleCount
+    RETURN gds.util.asNode(nodeId).%s AS node, triangleCount
     ORDER BY node ASC""" % G.identifier_property
 
     params = G.base_params()
 
     with G.driver.session() as session:
-        result = {row["node"]: row["triangles"] for row in session.run(query, params)}
+        result = {row["node"]: row["triangleCount"] for row in session.run(query, params)}
 
     if nodes:
         return {k: v for k, v in result.items() if k in nodes}
@@ -44,7 +44,7 @@ def triangles(G, nodes=None):
 def clustering(G, nodes=None, weight=None):
     # doesn't currently support `weight`
     query = """\
-    CALL gds.triangleCount.stream({
+    CALL gds.localClusteringCoefficient.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
             relType: {
@@ -53,14 +53,14 @@ def clustering(G, nodes=None, weight=None):
             properties: {}
             }
     }})
-    YIELD nodeId, triangles, coefficient
-    RETURN gds.util.asNode(nodeId).%s AS node, triangles, coefficient
-    ORDER BY coefficient DESC""" % G.identifier_property
+    YIELD nodeId, localClusteringCoefficient
+    RETURN gds.util.asNode(nodeId).%s AS node, localClusteringCoefficient
+    ORDER BY localClusteringCoefficient DESC""" % G.identifier_property
 
     params = G.base_params()
 
     with G.driver.session() as session:
-        result = {row["node"]: row["coefficient"] for row in session.run(query, params)}
+        result = {row["node"]: row["localClusteringCoefficient"] for row in session.run(query, params)}
     return result
 
     """TEST OUTPUT

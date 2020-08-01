@@ -3,7 +3,7 @@ TEST SETUP
 from neo4j import GraphDatabase
 import nxneo4j as nx
 
-driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
+driver = GraphDatabase.driver(uri="bolt://localhost:11003",auth=("neo4j","neo"))
 G = nx.Graph(driver)
 
 G.delete_all()
