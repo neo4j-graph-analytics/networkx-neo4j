@@ -1,12 +1,11 @@
 from neo4j import GraphDatabase
 
 import nxneo4j as nx
-import networkx as nx
-nx.__file__
 
 driver = GraphDatabase.driver(uri="bolt://localhost:11003",auth=("neo4j","neo"))
 G = nx.Graph(driver)
-G = nx.Graph()
+
+
 G.delete_all()
 G.add_node(1)
 G.add_nodes_from([2,3,4])
@@ -36,3 +35,6 @@ G.add_edges_from([(2,3),(3,4)])
 
 >>> nx.shortest_path(G, source=1, target=4)
 [1, 2, 3, 4]
+
+import pandas as pd
+pd.__version__
