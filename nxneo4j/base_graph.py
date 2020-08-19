@@ -1,8 +1,4 @@
-class NetworkXException(Exception):
-    """Base class for exceptions in NetworkX."""
-
-class NetworkXError(NetworkXException):
-    """Exception for a serious error in NetworkX"""
+from .exceptions import *
 
 class NodeView:
     def __init__(self, graph):
