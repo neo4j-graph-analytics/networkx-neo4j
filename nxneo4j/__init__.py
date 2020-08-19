@@ -4,3 +4,4 @@ from nxneo4j.path_finding import *
 from nxneo4j.graph import Graph
 from nxneo4j.di_graph import DiGraph
 from nxneo4j.draw import *
+from nxneo4j.exceptions import *

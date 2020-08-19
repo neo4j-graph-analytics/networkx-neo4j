@@ -13,6 +13,7 @@ def draw(G, limit=100):
                m.{G.identifier_property} AS target_node,
                id(m) AS target_id
     """
+
     result = G.driver.session().run(query)
     nodes = []
     edges = []
@@ -26,6 +27,7 @@ def draw(G, limit=100):
             nodes.append(node2)
         if (edge not in edges) & (edge['to'] != None):
             edges.append(edge)
+
     html = f"""
     <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>neo4j display</title>

@@ -1,12 +1,14 @@
 from neo4j import GraphDatabase
+import pytest
 
+import sys
+sys.path.insert(0, "/Users/ybaktir/networkx-neo4j")
 import nxneo4j as nx
-
+from nxneo4j import NetworkXError
 driver = GraphDatabase.driver(uri="bolt://localhost:11003",auth=("neo4j","neo"))
-G = nx.Graph(driver)
+G = nx.DiGraph(driver,config)
 
 
-G.delete_all()
 G.add_node(1)
 G.add_nodes_from([2,3,4])
 G.add_edge(1,2)
