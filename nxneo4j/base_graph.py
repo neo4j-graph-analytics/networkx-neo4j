@@ -1,4 +1,8 @@
-from .exceptions import *
+class NetworkXException(Exception):
+    """Base class for exceptions in NetworkX."""
+
+class NetworkXError(NetworkXException):
+    """Exception for a serious error in NetworkX"""
 
 class NodeView:
     def __init__(self, graph):
@@ -121,7 +125,7 @@ class BaseGraph:
             "direction": self.direction,
             "node_label": self.node_label,
             "relationship_type": self.relationship_type,
-            "identifier_property": self.identifier_property 
+            "identifier_property": self.identifier_property
     #        "graph": self.graph
         }
 
