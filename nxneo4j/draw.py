@@ -1,5 +1,9 @@
 from IPython.display import IFrame
+from neo4j import GraphDatabase
 
+driver = GraphDatabase.driver(uri="bolt://localhost:11003",auth=("neo4j","neo"))
+import nxneo4j as nx
+G = nx.Graph(driver)
 def draw(G, limit=100):
     query = f"""
     MATCH (n)
@@ -18,8 +22,8 @@ def draw(G, limit=100):
     nodes = []
     edges = []
     for row in result:
-        node1 = {'id':row['source_id'],'label':str(row['source_node'])}
-        node2 = {'id':row['target_id'],'label':str(row['target_node'])}
+        node1 = {'id':row['source_id'],'id':str(row['source_node'])}
+        node2 = {'id':row['target_id'],'id':str(row['target_node'])}
         edge  = {'from':row['source_id'],'to':row['target_id'],'label':row['label']}
         if (node1 not in nodes) & (node2['id'] != None):
             nodes.append(node1)
