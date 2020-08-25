@@ -22,12 +22,12 @@ def draw(G, limit=100):
     nodes = []
     edges = []
     for row in result:
-        node1 = {'id':row['source_id'],'id':str(row['source_node'])}
-        node2 = {'id':row['target_id'],'id':str(row['target_node'])}
+        node1 = {'id':row['source_id'],'label':str(row['source_node'])}
+        node2 = {'id':row['target_id'],'label':str(row['target_node'])}
         edge  = {'from':row['source_id'],'to':row['target_id'],'label':row['label']}
-        if (node1 not in nodes) & (node2['id'] != None):
+        if (node1 not in nodes) & (node2['label'] != None):
             nodes.append(node1)
-        if (node2 not in nodes) & (node2['id'] != None):
+        if (node2 not in nodes) & (node2['label'] != None):
             nodes.append(node2)
         if (edge not in edges) & (edge['to'] != None):
             edges.append(edge)
