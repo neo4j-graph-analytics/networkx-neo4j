@@ -1,9 +1,5 @@
 from IPython.display import IFrame
-from neo4j import GraphDatabase
 
-driver = GraphDatabase.driver(uri="bolt://localhost:11003",auth=("neo4j","neo"))
-import nxneo4j as nx
-G = nx.Graph(driver)
 def draw(G, limit=100):
     query = f"""
     MATCH (n)
