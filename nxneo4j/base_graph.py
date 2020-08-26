@@ -376,7 +376,7 @@ class BaseGraph:
             MERGE (tgt:Character {name: row.Target})
             // relationship for the book
             MERGE (src)-[r:INTERACTS1]->(tgt)
-            ON CREATE SET r.weight = toInt(row.weight), r.book=1
+            ON CREATE SET r.weight = toInteger(row.weight), r.book=1
             """)
 
             session.run("""\
@@ -385,7 +385,7 @@ class BaseGraph:
             MERGE (tgt:Character {name: row.Target})
             // relationship for the book
             MERGE (src)-[r:INTERACTS2]->(tgt)
-            ON CREATE SET r.weight = toInt(row.weight), r.book=2
+            ON CREATE SET r.weight = toInteger(row.weight), r.book=2
             """)
 
             session.run("""\
@@ -394,7 +394,7 @@ class BaseGraph:
             MERGE (tgt:Character {name: row.Target})
             // relationship for the book
             MERGE (src)-[r:INTERACTS3]->(tgt)
-            ON CREATE SET r.weight = toInt(row.weight), r.book=3
+            ON CREATE SET r.weight = toInteger(row.weight), r.book=3
             """)
 
             session.run("""\
@@ -403,9 +403,12 @@ class BaseGraph:
             MERGE (tgt:Character {name: row.Target})
             // relationship for the book
             MERGE (src)-[r:INTERACTS45]->(tgt)
-            ON CREATE SET r.weight = toInt(row.weight), r.book=45
+            ON CREATE SET r.weight = toInteger(row.weight), r.book=45
             """)
-
+            session.run("""\
+            DROP CONSTRAINT ON (c:Character)
+            ASSERT c.name IS UNIQUE
+            """)
     def load_euroads(self):
         with self.driver.session() as session:
             session.run("""\
@@ -426,7 +429,9 @@ class BaseGraph:
             MERGE (origin)-[eroad:EROAD {road_number: row.road_number}]->(destination)
             SET eroad.distance = toInteger(row.distance), eroad.watercrossing = row.watercrossing
             """)
-
+            session.run("""\
+            DROP CONSTRAINT ON (c:Character) ASSERT c.name IS UNIQUE
+            """)
     def load_twitter(self):
         with self.driver.session() as session:
             session.run("""\
@@ -444,4 +449,7 @@ class BaseGraph:
             FOREACH (follower IN value.followers |
               MERGE(f2:User {id: follower})
               MERGE (u)<-[:FOLLOWS]-(f2));
+            """)
+            session.run("""\
+            DROP CONSTRAINT ON(u:User) ASSERT u.id IS unique
             """)

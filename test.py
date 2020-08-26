@@ -1,3 +1,18 @@
+"""
+known fails
+G.add_node("Betul",age=4)
+G.add_node("Betul",age=5) #this does not update the first one
+
+G.nodes['Betul']['age'] = 5 #also does not work
+
+list(G.edges(data=True)) it would be nice to display labels here
+
+G.edges(['Betul','Nurgul']) #FAILS
+
+
+"""
+
+
 from neo4j import GraphDatabase
 import nxneo4j as nx
 

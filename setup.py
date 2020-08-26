@@ -27,7 +27,7 @@ packages = [
 if __name__ == "__main__":
     setup(
         name="networkx-neo4j",
-        version="0.0.2dev1",
+        version="0.0.3",
         maintainer="Mark Needham",
         maintainer_email="m.h.needham@gmal.com",
         author="Mark Needham",
