@@ -1,3 +1,5 @@
+# test only (import sys;sys.path.append("../"))  #the purpose is to reach to the parent directory
+# to fix the default port run $kill $(lsof -ti:7687)
 """
 known fails
 G.add_node("Betul",age=4)

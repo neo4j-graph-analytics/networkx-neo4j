@@ -409,6 +409,7 @@ class BaseGraph:
             DROP CONSTRAINT ON (c:Character)
             ASSERT c.name IS UNIQUE
             """)
+
     def load_euroads(self):
         with self.driver.session() as session:
             session.run("""\
@@ -430,7 +431,7 @@ class BaseGraph:
             SET eroad.distance = toInteger(row.distance), eroad.watercrossing = row.watercrossing
             """)
             session.run("""\
-            DROP CONSTRAINT ON (c:Character) ASSERT c.name IS UNIQUE
+            DROP CONSTRAINT ON (c:Place) ASSERT c.name IS UNIQUE
             """)
     def load_twitter(self):
         with self.driver.session() as session:

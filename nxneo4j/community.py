@@ -22,11 +22,6 @@ def triangles(G, nodes=None):
         return {k: v for k, v in result.items() if k in nodes}
     return result
 
-    """TEST OUTPUT
-    nx.triangles(G)
-    networkx.triangles(_G)
-    """
-
 def clustering(G, nodes=None, weight=None):
     # doesn't currently support `weight`
     query = """\
@@ -48,12 +43,6 @@ def clustering(G, nodes=None, weight=None):
     with G.driver.session() as session:
         result = {row["node"]: row["localClusteringCoefficient"] for row in session.run(query, params)}
     return result
-
-    """TEST OUTPUT
-    nx.clustering(G)
-    networkx.clustering(_G)
-    """
-
 
 def label_propagation_communities(G):
 
@@ -80,21 +69,15 @@ def label_propagation_communities(G):
         for row in session.run(query, params):
             yield set(row["nodes"])
 
-    """TEST OUTPUT
-    nx.label_propagation_communities(G)
-    networkx.networkx.algorithms.community.label_propagation.label_propagation_communities(_G)
-    """
-
-
 def connected_components(G):
 
     query = """\
     CALL gds.wcc.stream({
-        nodeProjection: 'Node',
+        nodeProjection: $node_label,
         relationshipProjection: {
             relType: {
-            type: 'CONNECTED',
-            orientation: 'UNDIRECTED',
+            type: $relationship_type,
+            orientation: $direction,
             properties: {}
         }
       }
@@ -113,8 +96,3 @@ def connected_components(G):
 
 def number_connected_components(G):
     return sum(1 for cc in connected_components(G))
-
-    """TEST OUTPUT
-    nx.connected_components(G)
-    nx.number_connected_components(G)
-    """

@@ -1,17 +1,3 @@
-"""Get Path-finding related metrics
-TEST SETUP
-from neo4j import GraphDatabase
-import nxneo4j as nx
-
-driver = GraphDatabase.driver(uri="bolt://localhost:11003",auth=("neo4j","neo"))
-G = nx.Graph(driver)
-
-G.delete_all()
-
-data = [(1, 2),(2, 3),(3, 4)]
-G.add_edges_from(data)
-"""
-
 def shortest_weighted_path(G,source, target, weight):
     if source is None:
         if target is None:
@@ -60,7 +46,8 @@ def shortest_weighted_path(G,source, target, weight):
                 },
                 startNode: source,
                 endNode: target,
-                relationshipWeightProperty: $propertyName
+                relationshipWeightProperty: $weight,
+                relationshipProperties: [$weight]
             })
             YIELD nodeId, cost
             RETURN gds.util.asNode(nodeId).%s AS node, cost
@@ -76,14 +63,10 @@ def shortest_weighted_path(G,source, target, weight):
                 params = G.base_params()
                 params["source"] = source
                 params["target"] = target
-                params["propertyName"] = weight
+                params["weight"] = weight
 
                 paths = [row["node"] for row in session.run(query, params)]
     return paths
 
 def shortest_path(G,source, target):
     return shortest_weighted_path(G,source, target, weight='')
-    """TEST OUTPUT
-    nx.shortest_weighted_path(G, source=1, target=3, weight='')
-    nx.shortest_path(G, source=1, target=3)
-    """
