@@ -23,10 +23,10 @@ def betweenness_centrality(G, k=None, normalized=True, weight=None, endpoints=Fa
 
     query = """\
     CALL gds.betweenness.stream({
-        nodeProjection: $nodeLabel,
+        nodeProjection: $node_label,
         relationshipProjection: {
             relType: {
-                type: $relationshipType,
+                type: $relationship_type,
                 orientation: $direction,
                 properties: {}
                 }
@@ -54,10 +54,10 @@ def closeness_centrality(G, u=None, distance=None, wf_improved=True, reverse=Fal
 
     query = """\
     CALL gds.alpha.closeness.stream({
-        nodeProjection: $nodeLabel,
+        nodeProjection: $node_label,
         relationshipProjection: {
             relType: {
-            type: $relationshipType,
+            type: $relationship_type,
             orientation: $direction,
             properties: {}
         }
@@ -86,10 +86,10 @@ def pagerank(G, alpha=0.85, personalization=None,  max_iter=100, tol=1.0e-8, nst
 
     query = """\
     CALL gds.pageRank.stream({
-        nodeProjection: $nodeLabel,
+        nodeProjection: $node_label,
         relationshipProjection: {
             relType: {
-                type: $relationshipType,
+                type: $relationship_type,
                 orientation: $direction,
                 properties: {}
             }

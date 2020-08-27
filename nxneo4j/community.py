@@ -1,24 +1,10 @@
-"""Get Community related metrics
-TEST SETUP
-from neo4j import GraphDatabase
-import nxneo4j as nx
-
-driver = GraphDatabase.driver(uri="bolt://localhost",auth=("neo4j","neo"))
-G = nx.Graph(driver)
-
-G.delete_all()
-
-data = [(1, 2),(2, 3),(3, 4)]
-G.add_edges_from(data)
-"""
-
 def triangles(G, nodes=None):
     query = """\
     CALL gds.triangleCount.stream({
-        nodeProjection: $nodeLabel,
+        nodeProjection: $node_label,
         relationshipProjection: {
             relType: {
-            type: $relationshipType,
+            type: $relationship_type,
             orientation: $direction,
             properties: {}
             }
@@ -45,10 +31,10 @@ def clustering(G, nodes=None, weight=None):
     # doesn't currently support `weight`
     query = """\
     CALL gds.localClusteringCoefficient.stream({
-        nodeProjection: $nodeLabel,
+        nodeProjection: $node_label,
         relationshipProjection: {
             relType: {
-            type: $relationshipType,
+            type: $relationship_type,
             orientation: $direction,
             properties: {}
             }
@@ -73,10 +59,10 @@ def label_propagation_communities(G):
 
     query = """\
     CALL gds.labelPropagation.stream({
-        nodeProjection: $nodeLabel,
+        nodeProjection: $node_label,
         relationshipProjection: {
             relType: {
-                type: $relationshipType,
+                type: $relationship_type,
                 orientation: $direction,
                 properties: {}
             }

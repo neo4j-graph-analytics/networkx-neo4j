@@ -50,10 +50,10 @@ def shortest_weighted_path(G,source, target, weight):
             MATCH (target:%s   {%s: $target })
 
             CALL gds.alpha.shortestPath.stream({
-                nodeProjection: $nodeLabel,
+                nodeProjection: $node_label,
                 relationshipProjection: {
                     relType: {
-                        type: $relationshipType,
+                        type: $relationship_type,
                         orientation: $direction,
                         properties: {}
                     }
