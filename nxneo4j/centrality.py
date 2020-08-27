@@ -32,15 +32,15 @@ def betweenness_centrality(G, k=None, normalized=True, weight=None, endpoints=Fa
                 }
             }
         })
-    YIELD nodeId, centrality
-    RETURN gds.util.asNode(nodeId).%s AS node, centrality
+    YIELD nodeId, score
+    RETURN gds.util.asNode(nodeId).%s AS node, score
     ORDER BY node ASC
     """ % G.identifier_property
 
     params = G.base_params()
 
     with G.driver.session() as session:
-        result = {row["node"]: row["centrality"] for row in session.run(query, params)}
+        result = {row["node"]: row["score"] for row in session.run(query, params)}
     return result
 
 
