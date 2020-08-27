@@ -22,7 +22,7 @@ def betweenness_centrality(G, k=None, normalized=True, weight=None, endpoints=Fa
     """
 
     query = """\
-    CALL gds.alpha.betweenness.stream({
+    CALL gds.betweenness.stream({
         nodeProjection: $nodeLabel,
         relationshipProjection: {
             relType: {
