@@ -57,23 +57,23 @@ def pagerank(G, alpha=0.85, personalization=None,  max_iter=100, tol=1.0e-8, nst
     # doesn't currently supported `personalization`, `tol`, `nstart`, `weight`
 
     query = """\
-    CALL gds.pageRank.stream({
-        nodeProjection: $node_label,
-        relationshipProjection: {
+        CALL gds.pageRank.stream({
+          nodeProjection: $node_label,
+          relationshipProjection: {
             relType: {
-                type: $relationship_type,
-                orientation: $direction,
-                properties: {}
+              type: $relationship_type,
+              orientation: $direction,
+              properties: {}
             }
-        },
-        relationshipWeightProperty: null,
-        dampingFactor: $dampingFactor,
-        maxIterations: $iterations
-    })
-    YIELD nodeId, score
-    RETURN gds.util.asNode(nodeId).%s AS node, score
-    ORDER BY node ASC
-    """ % G.identifier_property
+          },
+          relationshipWeightProperty: null,
+          dampingFactor: $dampingFactor,
+          maxIterations: $iterations
+        }) YIELD nodeId, score
+        WITH gds.util.asNode(nodeId).%s AS node, score
+        RETURN node, score
+        """ % G.identifier_property
+
 
     params = G.base_params()
     params["iterations"] = max_iter

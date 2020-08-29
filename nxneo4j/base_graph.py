@@ -366,8 +366,7 @@ class BaseGraph:
         """
         with self.driver.session() as session:
             session.run("""\
-            CREATE CONSTRAINT ON (c:Character)
-            ASSERT c.name IS UNIQUE
+            CREATE CONSTRAINT ON (c:Character) ASSERT c.name IS UNIQUE;
             """)
 
             session.run("""\
@@ -405,9 +404,9 @@ class BaseGraph:
             MERGE (src)-[r:INTERACTS45]->(tgt)
             ON CREATE SET r.weight = toInteger(row.weight), r.book=45
             """)
+        with self.driver.session() as session:
             session.run("""\
-            DROP CONSTRAINT ON (c:Character)
-            ASSERT c.name IS UNIQUE
+            DROP CONSTRAINT ON (c:Character) ASSERT c.name IS UNIQUE;
             """)
 
     def load_euroads(self):
@@ -415,7 +414,6 @@ class BaseGraph:
             session.run("""\
             CREATE CONSTRAINT ON (p:Place) ASSERT p.name IS UNIQUE
             """)
-
             session.run("""\
             USING PERIODIC COMMIT 1000
             LOAD CSV WITH HEADERS FROM "https://github.com/neo4j-apps/neuler/raw/master/sample-data/eroads/roads.csv"
@@ -430,8 +428,9 @@ class BaseGraph:
             MERGE (origin)-[eroad:EROAD {road_number: row.road_number}]->(destination)
             SET eroad.distance = toInteger(row.distance), eroad.watercrossing = row.watercrossing
             """)
+        with self.driver.session() as session:
             session.run("""\
-            DROP CONSTRAINT ON (c:Place) ASSERT c.name IS UNIQUE
+            DROP CONSTRAINT ON (p:Place) ASSERT p.name IS UNIQUE
             """)
     def load_twitter(self):
         with self.driver.session() as session:
@@ -451,6 +450,7 @@ class BaseGraph:
               MERGE(f2:User {id: follower})
               MERGE (u)<-[:FOLLOWS]-(f2));
             """)
+        with self.driver.session() as session:
             session.run("""\
             DROP CONSTRAINT ON(u:User) ASSERT u.id IS unique
             """)
