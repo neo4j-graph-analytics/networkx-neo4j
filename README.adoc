@@ -3,6 +3,14 @@
 This library provides NetworkX API for https://github.com/neo4j/graph-data-science/[Neo4j Graph Data Science^].
 You should be able to use it as you would NetworkX but algorithms will run against Neo4j.
 
+== Dependencies
+
+- ≥ Neo4j 4.x
+- Graph Data Science Library Plugin
+- APOC Plugin
+- ≥ Python 3.6
+- ≥ neo4j-driver 4.x
+
 == Installation
 
 You can install the library by running the following command:

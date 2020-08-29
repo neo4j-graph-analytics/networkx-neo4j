@@ -28,7 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - No removals
 
-
+### Known Issues (by [@ybaktir](https://github.com/ybaktir))
+- len(G) doesn't return the correct value, uses config restrictions
+- after G.load_got() and after nx.draw(G), some of the relationship labels don't show on the visualization
 
 ## [0.0.2] - 2020-08-25
 ### Added (by [@ybaktir](https://github.com/ybaktir))
