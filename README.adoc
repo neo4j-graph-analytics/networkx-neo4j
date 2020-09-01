@@ -100,3 +100,8 @@ The available algoritms in `nxneo4j` are:
 [1, 3, 4, 5]
 
 ----
+
+== Credits
+Yusuf Baktir
+Mark Needham
+David Jablonski
