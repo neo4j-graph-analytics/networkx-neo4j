@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Setup script for networkx-neo4j
 You can install networkx-neo4j with
@@ -29,11 +27,11 @@ packages = [
 if __name__ == "__main__":
     setup(
         name="networkx-neo4j",
-        version="0.0.1",
+        version="0.0.3",
         maintainer="Mark Needham",
         maintainer_email="m.h.needham@gmal.com",
         author="Mark Needham",
-        author_email="m.h.needham@gmal.com",
+        author_email="m.h.needham@gmail.com",
         description="NetworkX API for Neo4j Graph Algorithms",
         keywords="neo4j, networkx",
         long_description="NetworkX API for Neo4j Graph Algorithms",

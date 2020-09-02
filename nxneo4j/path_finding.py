@@ -1,4 +1,4 @@
-def shortest_path(G, source=None, target=None, weight=None):
+def shortest_weighted_path(G,source, target, weight):
     if source is None:
         if target is None:
             # Find paths between all pairs.
@@ -30,10 +30,43 @@ def shortest_path(G, source=None, target=None, weight=None):
                 #                                        weight=weight)
                 paths = []
         else:
-            # Find shortest source-target path.
-            if weight is None:
-                paths = G.shortest_path(source, target)
-            else:
-                paths = G.shortest_weighted_path(source, target, weight)
 
+            query = """\
+            MATCH (source:%s   {%s: $source })
+            MATCH (target:%s   {%s: $target })
+
+            CALL gds.alpha.shortestPath.stream({
+                nodeProjection: $node_label,
+                relationshipProjection: {
+                    relType: {
+                        type: $relationship_type,
+                        orientation: $direction,
+                        properties: {}
+                    }
+                },
+                startNode: source,
+                endNode: target,
+                relationshipWeightProperty: $weight,
+                relationshipProperties: [$weight]
+            })
+            YIELD nodeId, cost
+            RETURN gds.util.asNode(nodeId).%s AS node, cost
+            """ % (
+                G.node_label,
+                G.identifier_property,
+                G.node_label,
+                G.identifier_property,
+                G.identifier_property
+            )
+
+            with G.driver.session() as session:
+                params = G.base_params()
+                params["source"] = source
+                params["target"] = target
+                params["weight"] = weight
+
+                paths = [row["node"] for row in session.run(query, params)]
     return paths
+
+def shortest_path(G,source, target):
+    return shortest_weighted_path(G,source, target, weight='')
